@@ -1,0 +1,259 @@
+{
+  "address": "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS",
+  "metadata": {
+    "name": "cookie_bounties",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Cookie Bounties — on-chain bounty escrow program for Cookie Chain"
+  },
+  "instructions": [
+    {
+      "name": "create_and_fund_bounty",
+      "discriminator": [5, 135, 151, 213, 201, 104, 230, 184],
+      "accounts": [
+        { "name": "creator", "writable": true, "signer": true },
+        { "name": "bounty", "writable": true },
+        { "name": "escrow", "writable": true },
+        { "name": "system_program", "address": "11111111111111111111111111111111" }
+      ],
+      "args": [
+        { "name": "bounty_id", "type": "u64" },
+        { "name": "title", "type": "string" },
+        { "name": "description_uri", "type": "string" },
+        { "name": "category", "type": { "defined": { "name": "BountyCategory" } } },
+        { "name": "reward_amount", "type": "u64" },
+        { "name": "deadline", "type": "i64" }
+      ]
+    },
+    {
+      "name": "submit_work",
+      "discriminator": [158, 80, 101, 51, 114, 130, 101, 253],
+      "accounts": [
+        { "name": "contributor", "writable": true, "signer": true },
+        { "name": "bounty", "writable": true },
+        { "name": "submission", "writable": true },
+        { "name": "system_program", "address": "11111111111111111111111111111111" }
+      ],
+      "args": [{ "name": "submission_uri", "type": "string" }]
+    },
+    {
+      "name": "approve_submission",
+      "discriminator": [154, 76, 116, 120, 143, 128, 16, 205],
+      "accounts": [
+        { "name": "creator", "writable": true, "signer": true },
+        { "name": "bounty", "writable": true },
+        { "name": "submission", "writable": true },
+        { "name": "escrow", "writable": true },
+        { "name": "contributor", "writable": true },
+        { "name": "system_program", "address": "11111111111111111111111111111111" }
+      ],
+      "args": []
+    },
+    {
+      "name": "cancel_bounty",
+      "discriminator": [79, 65, 107, 143, 128, 165, 135, 46],
+      "accounts": [
+        { "name": "creator", "writable": true, "signer": true },
+        { "name": "bounty", "writable": true },
+        { "name": "escrow", "writable": true }
+      ],
+      "args": []
+    },
+    {
+      "name": "refund_bounty",
+      "discriminator": [167, 234, 121, 108, 247, 216, 216, 124],
+      "accounts": [
+        { "name": "creator", "writable": true, "signer": true },
+        { "name": "bounty", "writable": true },
+        { "name": "escrow", "writable": true }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    { "name": "Bounty", "discriminator": [237, 16, 105, 198, 19, 69, 242, 234] },
+    { "name": "Escrow", "discriminator": [31, 213, 123, 187, 186, 22, 218, 155] },
+    { "name": "Submission", "discriminator": [58, 194, 159, 158, 75, 102, 178, 197] }
+  ],
+  "events": [
+    { "name": "BountyCreated", "discriminator": [68, 252, 247, 196, 154, 247, 130, 49] },
+    { "name": "BountyFunded", "discriminator": [142, 150, 1, 35, 45, 75, 188, 226] },
+    { "name": "SubmissionCreated", "discriminator": [27, 207, 175, 100, 160, 225, 121, 79] },
+    { "name": "SubmissionApproved", "discriminator": [59, 102, 182, 29, 243, 202, 148, 164] },
+    { "name": "BountyCancelled", "discriminator": [234, 186, 248, 214, 198, 69, 152, 23] },
+    { "name": "BountyRefunded", "discriminator": [158, 18, 109, 41, 239, 13, 79, 43] }
+  ],
+  "errors": [
+    { "code": 6000, "name": "InvalidReward", "msg": "Reward must be greater than zero." },
+    { "code": 6001, "name": "InvalidDeadline", "msg": "Deadline must be in the future." },
+    { "code": 6002, "name": "TitleTooLong", "msg": "Title is too long." },
+    { "code": 6003, "name": "UriTooLong", "msg": "Metadata URI is too long." },
+    { "code": 6004, "name": "BountyNotActive", "msg": "This bounty is not active." },
+    { "code": 6005, "name": "BountyExpired", "msg": "This bounty has expired." },
+    { "code": 6006, "name": "AlreadyCompleted", "msg": "This bounty has already been completed." },
+    { "code": 6007, "name": "Unauthorized", "msg": "Only the bounty creator can perform this action." },
+    { "code": 6008, "name": "SubmissionMismatch", "msg": "This submission does not belong to the bounty." },
+    { "code": 6009, "name": "SubmissionNotPending", "msg": "This submission is not pending." },
+    { "code": 6010, "name": "ContributorMismatch", "msg": "The contributor account does not match the submission." },
+    { "code": 6011, "name": "EscrowMismatch", "msg": "The escrow does not belong to this bounty." },
+    { "code": 6012, "name": "NotExpired", "msg": "The bounty has not expired yet." },
+    { "code": 6013, "name": "CannotCancel", "msg": "The bounty cannot be cancelled after a submission is approved." },
+    { "code": 6014, "name": "InsufficientEscrow", "msg": "Escrow has insufficient funds." },
+    { "code": 6015, "name": "MathOverflow", "msg": "Arithmetic overflow." }
+  ],
+  "types": [
+    {
+      "name": "Bounty",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "creator", "type": "pubkey" },
+          { "name": "bounty_id", "type": "u64" },
+          { "name": "title", "type": "string" },
+          { "name": "description_uri", "type": "string" },
+          { "name": "category", "type": { "defined": { "name": "BountyCategory" } } },
+          { "name": "reward_amount", "type": "u64" },
+          { "name": "deadline", "type": "i64" },
+          { "name": "status", "type": { "defined": { "name": "BountyStatus" } } },
+          { "name": "submission_count", "type": "u32" },
+          { "name": "winning_submission", "type": { "option": "pubkey" } },
+          { "name": "created_at", "type": "i64" },
+          { "name": "bump", "type": "u8" }
+        ]
+      }
+    },
+    {
+      "name": "Escrow",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "bounty", "type": "pubkey" },
+          { "name": "amount", "type": "u64" },
+          { "name": "bump", "type": "u8" }
+        ]
+      }
+    },
+    {
+      "name": "Submission",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "bounty", "type": "pubkey" },
+          { "name": "contributor", "type": "pubkey" },
+          { "name": "submission_id", "type": "u64" },
+          { "name": "submission_uri", "type": "string" },
+          { "name": "submitted_at", "type": "i64" },
+          { "name": "status", "type": { "defined": { "name": "SubmissionStatus" } } },
+          { "name": "bump", "type": "u8" }
+        ]
+      }
+    },
+    {
+      "name": "BountyStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Active" },
+          { "name": "Reviewing" },
+          { "name": "Completed" },
+          { "name": "Cancelled" },
+          { "name": "Expired" }
+        ]
+      }
+    },
+    {
+      "name": "SubmissionStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [{ "name": "Pending" }, { "name": "Approved" }, { "name": "Rejected" }]
+      }
+    },
+    {
+      "name": "BountyCategory",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Development" },
+          { "name": "Design" },
+          { "name": "Content" },
+          { "name": "Community" },
+          { "name": "Research" },
+          { "name": "Marketing" },
+          { "name": "Memes" },
+          { "name": "Other" }
+        ]
+      }
+    },
+    {
+      "name": "BountyCreated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "bounty", "type": "pubkey" },
+          { "name": "creator", "type": "pubkey" },
+          { "name": "bounty_id", "type": "u64" },
+          { "name": "category", "type": "string" },
+          { "name": "reward_amount", "type": "u64" },
+          { "name": "deadline", "type": "i64" }
+        ]
+      }
+    },
+    {
+      "name": "BountyFunded",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "bounty", "type": "pubkey" },
+          { "name": "creator", "type": "pubkey" },
+          { "name": "reward_amount", "type": "u64" }
+        ]
+      }
+    },
+    {
+      "name": "SubmissionCreated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "bounty", "type": "pubkey" },
+          { "name": "submission", "type": "pubkey" },
+          { "name": "contributor", "type": "pubkey" },
+          { "name": "submission_id", "type": "u64" }
+        ]
+      }
+    },
+    {
+      "name": "SubmissionApproved",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "bounty", "type": "pubkey" },
+          { "name": "submission", "type": "pubkey" },
+          { "name": "contributor", "type": "pubkey" },
+          { "name": "reward_amount", "type": "u64" }
+        ]
+      }
+    },
+    {
+      "name": "BountyCancelled",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "bounty", "type": "pubkey" },
+          { "name": "creator", "type": "pubkey" },
+          { "name": "refund_amount", "type": "u64" }
+        ]
+      }
+    },
+    {
+      "name": "BountyRefunded",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "bounty", "type": "pubkey" },
+          { "name": "creator", "type": "pubkey" },
+          { "name": "refund_amount", "type": "u64" }
+        ]
+      }
+    }
+  ]
+}

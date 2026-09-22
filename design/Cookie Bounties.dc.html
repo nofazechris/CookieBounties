@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Figtree:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="_ds/organic-e0ace58d-0e9e-409a-91f1-d99014bb2b98/styles.css">
+<style>
+  body { margin:0; background:#141110; color:#f5ead8; font-family:"Figtree",system-ui,sans-serif; }
+  h1,h2,h3,h4,h5 { font-family:"Caprasimo",system-ui,serif; font-weight:400; letter-spacing:-0.015em; margin:0; line-height:1.08; }
+  p { margin:0; }
+  a { color:#f6a06b; text-underline-offset:3px; }
+  a:hover { color:#ffc6a5; }
+  button { font-family:inherit; }
+  :focus-visible { outline:2px solid #f6a06b; outline-offset:2px; }
+  ::selection { background:rgba(246,160,107,0.3); }
+  ::-webkit-scrollbar { width:10px; height:10px; }
+  ::-webkit-scrollbar-thumb { background:rgba(245,234,216,0.16); border-radius:99px; }
+  @keyframes cbFlow { 0% { transform:translateY(-6px); opacity:0 } 15% { opacity:1 } 85% { opacity:1 } 100% { transform:translateY(186px); opacity:0 } }
+  @keyframes cbPulse { 0%,100% { opacity:1 } 50% { opacity:0.35 } }
+  @keyframes cbIn { from { transform:translateY(-10px); opacity:0 } to { transform:translateY(0); opacity:1 } }
+  @keyframes cbPop { from { transform:scale(0.92); opacity:0 } to { transform:scale(1); opacity:1 } }
+  @keyframes cbGlow { 0%,100% { box-shadow:0 0 0 0 rgba(246,160,107,0.35) } 50% { box-shadow:0 0 0 12px rgba(246,160,107,0) } }
+  @keyframes cbSpin { to { transform:rotate(360deg) } }
+</style>
+</helmet>
+
+<div style="min-height:100vh; background:#141110; color:#f5ead8; font-family:'Figtree',system-ui,sans-serif; font-size:15px; line-height:1.55; padding-bottom:{{ shellPadBottom }}">
+
+  <!-- ─── top bar ─── -->
+  <div style="position:sticky; top:0; z-index:40; background:rgba(20,17,16,0.86); backdrop-filter:blur(14px); border-bottom:1px solid rgba(245,234,216,0.1)">
+    <div style="max-width:1220px; margin:0 auto; padding:14px 22px; display:flex; align-items:center; gap:26px">
+      <button onClick="{{ goHome }}" style="display:flex; align-items:center; gap:10px; background:none; border:0; padding:0; cursor:pointer; color:#f5ead8">
+        <span style="width:30px; height:30px; border-radius:999px; background:#c67139; display:grid; place-items:center; flex:none">
+          <span style="width:12px; height:12px; border-radius:999px; background:#141110; box-shadow:6px -4px 0 -4px #141110, -5px 5px 0 -4.5px #141110"></span>
+        </span>
+        <span style="font-family:'Caprasimo',serif; font-size:17px; letter-spacing:0.01em">Cookie Bounties</span>
+      </button>
+
+      <sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}">
+        <nav style="display:flex; gap:4px; margin-left:8px; flex:none">
+          <sc-for list="{{ navItems }}" as="item" hint-placeholder-count="5">
+            <button onClick="{{ item.go }}" style="background:{{ item.bg }}; color:{{ item.color }}; border:0; border-radius:999px; padding:8px 15px; font-size:14px; font-weight:600; cursor:pointer; white-space:nowrap; flex:none" style-hover="background:rgba(245,234,216,0.09)">{{ item.label }}</button>
+          </sc-for>
+        </nav>
+      </sc-if>
+
+      <div style="flex:1"></div>
+
+      <sc-if value="{{ connected }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex; align-items:center; gap:10px; flex:none">
+          <button onClick="{{ openGetCook }}" style="background:transparent; border:1px solid rgba(245,234,216,0.18); color:#f5ead8; border-radius:999px; padding:8px 14px; font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap; flex:none" style-hover="border-color:#f6a06b; color:#f6a06b">Get COOK</button>
+          <button onClick="{{ openWallet }}" style="display:flex; align-items:center; gap:10px; background:#1f1a18; border:1px solid rgba(245,234,216,0.14); border-radius:999px; padding:6px 8px 6px 14px; cursor:pointer; color:#f5ead8; white-space:nowrap; flex:none" style-hover="border-color:rgba(246,160,107,0.6)">
+            <span style="font-size:13px; font-weight:700; font-variant-numeric:tabular-nums">{{ balanceLabel }}</span>
+            <span style="background:#2a2321; border-radius:999px; padding:4px 10px; font-size:12.5px; font-weight:700; color:#f6a06b; font-variant-numeric:tabular-nums">{{ shortAddress }}</span>
+          </button>
+        </div>
+      </sc-if>
+      <sc-if value="{{ disconnected }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ connect }}" style="background:#c67139; color:#141110; border:0; border-radius:999px; padding:10px 18px; font-family:'Caprasimo',serif; font-size:14px; cursor:pointer; white-space:nowrap; flex:none" style-hover="background:#e08a4e" style-active="background:#b2622d">Connect Nightly</button>
+      </sc-if>
+    </div>
+  </div>
+
+  <!-- ══════════ HOME ══════════ -->
+  <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+  <div>
+    <section style="max-width:1220px; margin:0 auto; padding:56px 22px 20px; display:grid; gap:44px; grid-template-columns:{{ heroCols }}; align-items:start">
+      <div>
+        <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(174,191,146,0.12); border:1px solid rgba(174,191,146,0.3); color:#c8d6ae; border-radius:999px; padding:6px 14px; font-size:12.5px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; white-space:nowrap">
+          <span style="width:7px; height:7px; border-radius:999px; background:#aebf92; animation:cbPulse 1.8s ease-in-out infinite"></span>Live on Cookie Chain
+        </div>
+        <h1 style="font-size:{{ heroSize }}; margin:20px 0 0; line-height:0.98">Build something.<br><span style="color:#f6a06b">Get paid on-chain.</span></h1>
+        <p style="margin:20px 0 0; font-size:18px; max-width:30em; color:rgba(245,234,216,0.72)">Community-powered tasks funded and settled on Cookie Chain. The reward is locked in escrow before anyone starts working.</p>
+        <div style="display:flex; flex-wrap:wrap; gap:12px; margin-top:28px">
+          <button onClick="{{ goCreate }}" style="background:#c67139; color:#141110; border:0; border-radius:999px; padding:14px 26px; font-family:'Caprasimo',serif; font-size:16px; cursor:pointer" style-hover="background:#e08a4e" style-active="background:#b2622d">Create a Bounty</button>
+          <button onClick="{{ goBounties }}" style="background:transparent; color:#f5ead8; border:1px solid rgba(245,234,216,0.24); border-radius:999px; padding:14px 26px; font-family:'Caprasimo',serif; font-size:16px; cursor:pointer" style-hover="background:rgba(245,234,216,0.07)">Explore Bounties</button>
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:26px; margin-top:38px; padding-top:26px; border-top:1px solid rgba(245,234,216,0.1)">
+          <sc-for list="{{ globalStats }}" as="stat" hint-placeholder-count="4">
+            <div>
+              <div style="font-family:'Caprasimo',serif; font-size:26px; color:#f5ead8; font-variant-numeric:tabular-nums">{{ stat.value }}</div>
+              <div style="font-size:11.5px; letter-spacing:0.09em; text-transform:uppercase; color:rgba(245,234,216,0.5); font-weight:700; margin-top:2px">{{ stat.label }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <!-- escrow flow diagram -->
+      <div style="background:#1a1615; border:1px solid rgba(245,234,216,0.1); border-radius:28px; padding:26px 24px; position:relative; overflow:hidden">
+        <div style="font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; font-weight:700; color:rgba(245,234,216,0.45)">How a bounty settles</div>
+        <div style="position:relative; margin-top:18px">
+          <div style="position:absolute; left:50%; top:26px; bottom:26px; width:2px; background:linear-gradient(#c67139,rgba(174,191,146,0.6)); transform:translateX(-50%); opacity:0.35"></div>
+          <div style="position:absolute; left:50%; top:26px; transform:translateX(-50%); width:22px; height:22px; border-radius:999px; background:#f6a06b; color:#141110; font-size:10px; font-weight:800; display:grid; place-items:center; animation:cbFlow 3.4s cubic-bezier(.6,0,.4,1) infinite">5</div>
+          <div style="position:relative; display:grid; gap:14px">
+            <sc-for list="{{ flowNodes }}" as="node" hint-placeholder-count="5">
+              <div style="display:flex; align-items:center; gap:14px; background:{{ node.bg }}; border:1px solid {{ node.border }}; border-radius:16px; padding:13px 16px">
+                <span style="width:9px; height:9px; border-radius:999px; background:{{ node.dot }}; flex:none"></span>
+                <div style="flex:1; min-width:0">
+                  <div style="font-size:14.5px; font-weight:700">{{ node.title }}</div>
+                  <div style="font-size:12.5px; color:rgba(245,234,216,0.55)">{{ node.sub }}</div>
+                </div>
+                <div style="font-family:'Caprasimo',serif; font-size:15px; color:{{ node.dot }}; font-variant-numeric:tabular-nums">{{ node.amount }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- live activity strip -->
+    <section style="max-width:1220px; margin:0 auto; padding:34px 22px 0">
+      <div style="display:flex; align-items:baseline; justify-content:space-between; gap:16px; margin-bottom:14px">
+        <h3 style="font-size:19px">Happening now</h3>
+        <button onClick="{{ goActivity }}" style="background:none; border:0; color:#f6a06b; font-size:13.5px; font-weight:700; cursor:pointer; padding:0">Open activity feed →</button>
+      </div>
+      <div style="display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">
+        <sc-for list="{{ heroActivity }}" as="item" hint-placeholder-count="3">
+          <div style="background:#1a1615; border:1px solid rgba(245,234,216,0.1); border-radius:16px; padding:16px 18px; animation:cbIn 420ms ease both">
+            <div style="display:flex; align-items:center; gap:8px; font-size:11px; letter-spacing:0.09em; text-transform:uppercase; font-weight:800; color:{{ item.color }}">
+              <span style="width:7px; height:7px; border-radius:999px; background:{{ item.color }}"></span>{{ item.kind }}
+            </div>
+            <div style="font-size:15px; font-weight:700; margin-top:9px">{{ item.title }}</div>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:10px">
+              <span style="font-family:'Caprasimo',serif; font-size:15px; color:#f6a06b">{{ item.amount }}</span>
+              <span style="font-size:12px; color:rgba(245,234,216,0.5); font-variant-numeric:tabular-nums">{{ item.meta }}</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <!-- how it works -->
+    <section style="max-width:1220px; margin:0 auto; padding:62px 22px 0">
+      <h2 style="font-size:34px">How it works</h2>
+      <div style="display:grid; gap:16px; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); margin-top:22px">
+        <sc-for list="{{ howCards }}" as="card" hint-placeholder-count="3">
+          <div style="background:#1a1615; border:1px solid rgba(245,234,216,0.1); border-radius:22px; padding:26px 24px 28px; transition:transform 220ms ease, border-color 220ms ease" style-hover="transform:translateY(-4px); border-color:rgba(246,160,107,0.45)">
+            <div style="font-family:'Caprasimo',serif; font-size:40px; color:rgba(246,160,107,0.5); line-height:1">{{ card.num }}</div>
+            <h4 style="font-size:22px; margin-top:12px">{{ card.title }}</h4>
+            <p style="margin-top:8px; color:rgba(245,234,216,0.68); font-size:15px">{{ card.body }}</p>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <!-- trust -->
+    <section style="max-width:1220px; margin:0 auto; padding:62px 22px 0">
+      <div style="background:linear-gradient(135deg,#241c18,#191514); border:1px solid rgba(246,160,107,0.28); border-radius:28px; padding:40px 36px; display:grid; gap:28px; grid-template-columns:{{ trustCols }}; align-items:center">
+        <div>
+          <h2 style="font-size:32px; color:#f6a06b">Your reward is already there</h2>
+          <p style="margin-top:12px; font-size:17px; color:rgba(245,234,216,0.78); max-width:34em">Creators fund bounties before contributors start working. The reward isn't a promise — it's secured on-chain by the Cookie Bounties program until the bounty is completed, cancelled or refunded.</p>
+          <button onClick="{{ goDocs }}" style="margin-top:18px; background:none; border:0; color:#f6a06b; font-size:14px; font-weight:700; cursor:pointer; padding:0">Read how escrow works →</button>
+        </div>
+        <div style="background:#141110; border:1px solid rgba(245,234,216,0.12); border-radius:20px; padding:22px; text-align:center">
+          <div style="font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; font-weight:700; color:rgba(245,234,216,0.45)">Locked in escrow</div>
+          <div style="font-family:'Caprasimo',serif; font-size:44px; color:#f6a06b; margin-top:8px">5 COOK</div>
+          <div style="display:inline-flex; align-items:center; gap:7px; margin-top:10px; background:rgba(174,191,146,0.14); color:#c8d6ae; border-radius:999px; padding:6px 14px; font-size:12px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; white-space:nowrap">✓ Funded</div>
+          <div style="margin-top:14px; font-size:12.5px; color:rgba(245,234,216,0.5); word-break:break-all">Program-derived escrow account</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- live bounties -->
+    <section style="max-width:1220px; margin:0 auto; padding:62px 22px 0">
+      <div style="display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:12px">
+        <h2 style="font-size:34px">Find something to build</h2>
+        <button onClick="{{ goBounties }}" style="background:none; border:0; color:#f6a06b; font-size:14px; font-weight:700; cursor:pointer; padding:0">All bounties →</button>
+      </div>
+      <div style="display:grid; gap:16px; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); margin-top:22px">
+        <sc-for list="{{ featuredBounties }}" as="b" hint-placeholder-count="3">
+          <div onClick="{{ b.open }}" style="background:#1a1615; border:1px solid rgba(245,234,216,0.1); border-radius:20px; padding:20px; cursor:pointer; display:flex; flex-direction:column; gap:12px; transition:transform 200ms ease, border-color 200ms ease" style-hover="transform:translateY(-3px); border-color:rgba(246,160,107,0.5)">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px">
+              <span style="background:rgba(245,234,216,0.08); border-radius:999px; padding:4px 11px; font-size:11px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; color:rgba(245,234,216,0.72)">{{ b.category }}</span>
+              <span style="display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:800; letter-spacing:0.07em; text-transform:uppercase; color:{{ b.statusColor }}"><span style="width:6px; height:6px; border-radius:999px; background:{{ b.statusColor }}"></span>{{ b.status }}</span>
+            </div>
+            <h4 style="font-size:19px; text-wrap:pretty">{{ b.title }}</h4>
+            <div style="font-family:'Caprasimo',serif; font-size:32px; color:#f6a06b; line-height:1">{{ b.reward }}</div>
+            <div style="display:flex; gap:14px; font-size:12.5px; color:rgba(245,234,216,0.55); font-variant-numeric:tabular-nums">
+              <span>{{ b.ends }}</span><span>{{ b.subs }}</span>
+            </div>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; padding-top:12px; border-top:1px solid rgba(245,234,216,0.09)">
+              <span style="font-size:12.5px; color:rgba(245,234,216,0.5)">by {{ b.creator }}</span>
+              <span style="font-size:13px; font-weight:700; color:#f6a06b">View bounty →</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <!-- why cookie chain -->
+    <section style="max-width:1220px; margin:0 auto; padding:62px 22px 0">
+      <h2 style="font-size:34px; max-width:14em">Built for fast community payments</h2>
+      <p style="margin-top:12px; max-width:44em; font-size:16.5px; color:rgba(245,234,216,0.7)">Cookie Bounties uses Cookie Chain's SVM-compatible infrastructure for fast, low-cost on-chain bounty funding and payouts.</p>
+      <div style="display:grid; gap:16px; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); margin-top:24px">
+        <sc-for list="{{ whyCards }}" as="c" hint-placeholder-count="3">
+          <div style="border:1px solid rgba(245,234,216,0.1); border-radius:20px; padding:24px; background:#1a1615">
+            <h4 style="font-size:20px; color:#aebf92">{{ c.title }}</h4>
+            <p style="margin-top:8px; font-size:14.5px; color:rgba(245,234,216,0.66)">{{ c.body }}</p>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <!-- closing cta -->
+    <section style="max-width:1220px; margin:0 auto; padding:62px 22px 80px">
+      <div style="border:1px solid rgba(245,234,216,0.12); border-radius:28px; padding:48px 36px; text-align:center; background:#1a1615">
+        <h2 style="font-size:36px">Got something worth building?</h2>
+        <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:22px">
+          <button onClick="{{ goCreate }}" style="background:#c67139; color:#141110; border:0; border-radius:999px; padding:14px 26px; font-family:'Caprasimo',serif; font-size:16px; cursor:pointer" style-hover="background:#e08a4e">Create a Bounty</button>
+          <button onClick="{{ goActivity }}" style="background:transparent; color:#f5ead8; border:1px solid rgba(245,234,216,0.24); border-radius:999px; padding:14px 26px; font-family:'Caprasimo',serif; font-size:16px; cursor:pointer" style-hover="background:rgba(245,234,216,0.07)">Explore the Community</button>
+        </div>
+      </div>
+    </section>
+  </div>
+  </sc-if>
+
+  <!-- ══════════ EXPLORE BOUNTIES ══════════ -->
+  <sc-if value="{{ isBounties }}" hint-placeholder-val="{{ false }}">
+  <section style="max-width:1220px; margin:0 auto; padding:44px 22px 80px">
+    <h1 style="font-size:40px">Explore bounties</h1>
+    <p style="margin-top:10px; font-size:17px; color:rgba(245,234,216,0.65)">Find something worth building.</p>
+
+    <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:26px">
+      <sc-for list="{{ categories }}" as="c" hint-placeholder-count="7">
+        <button onClick="{{ c.select }}" style="background:{{ c.bg }}; color:{{ c.color }}; border:1px solid {{ c.border }}; border-radius:999px; padding:8px 16px; font-size:13.5px; font-weight:700; cursor:pointer" style-hover="border-color:rgba(246,160,107,0.6)">{{ c.label }}</button>
+      </sc-for>
+    </div>
+
+    <div style="display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-top:16px; padding-bottom:18px; border-bottom:1px solid rgba(245,234,216,0.1)">
+      <span style="font-size:12px; letter-spacing:0.08em; text-transform:uppercase; font-weight:800; color:rgba(245,234,216,0.45)">Sort</span>
+      <sc-for list="{{ sorts }}" as="s" hint-placeholder-count="4">
+        <button onClick="{{ s.select }}" style="background:none; border:0; padding:4px 2px; margin-right:10px; font-size:13.5px; font-weight:700; cursor:pointer; color:{{ s.color }}; border-bottom:2px solid {{ s.underline }}">{{ s.label }}</button>
+      </sc-for>
+      <div style="flex:1"></div>
+      <span style="font-size:13px; color:rgba(245,234,216,0.5)">{{ resultCount }}</span>
+    </div>
+
+    <div style="display:grid; gap:16px; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); margin-top:22px">
+      <sc-for list="{{ filteredBounties }}" as="b" hint-placeholder-count="6">
+        <div onClick="{{ b.open }}" style="background:#1a1615; border:1px solid rgba(245,234,216,0.1); border-radius:20px; padding:20px; cursor:pointer; display:flex; flex-direction:column; gap:12px; transition:transform 200ms ease, border-color 200ms ease" style-hover="transform:translateY(-3px); border-color:rgba(246,160,107,0.5)">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px">
+            <span style="background:rgba(245,234,216,0.08); border-radius:999px; padding:4px 11px; font-size:11px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; color:rgba(245,234,216,0.72)">{{ b.category }}</span>
+            <span style="display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:800; letter-spacing:0.07em; text-transform:uppercase; color:{{ b.statusColor }}"><span style="width:6px; height:6px; border-radius:999px; background:{{ b.statusColor }}"></span>{{ b.status }}</span>
+          </div>
+          <h4 style="font-size:19px; text-wrap:pretty">{{ b.title }}</h4>
+          <div style="font-family:'Caprasimo',serif; font-size:32px; color:#f6a06b; line-height:1">{{ b.reward }}</div>
+          <div style="display:flex; gap:14px; font-size:12.5px; color:rgba(245,234,216,0.55); font-variant-numeric:tabular-nums">
+            <span>{{ b.ends }}</span><span>{{ b.subs }}</span>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; padding-top:12px; border-top:1px solid rgba(245,234,216,0.09)">
+            <span style="font-size:12.5px; color:rgba(245,234,216,0.5)">by {{ b.creator }}</span>
+            <span style="font-size:13px; font-weight:700; color:#f6a06b">View bounty →</span>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+
+    <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}">
+      <div style="text-align:center; padding:72px 20px; border:1px dashed rgba(245,234,216,0.16); border-radius:24px; margin-top:22px">
+        <h3 style="font-size:24px">Nothing here yet.</h3>
+        <p style="margin-top:8px; color:rgba(245,234,216,0.6)">Be the first person to create a bounty in this category.</p>
+        <button onClick="{{ goCreate }}" style="margin-top:18px; background:#c67139; color:#141110; border:0; border-radius:999px; padding:12px 22px; font-family:'Caprasimo',serif; font-size:15px; cursor:pointer">Create Bounty</button>
+      </div>
+    </sc-if>
+  </section>
+  </sc-if>
+
+  <!-- ══════════ BOUNTY DETAIL ══════════ -->
+  <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+  <section style="max-width:1220px; margin:0 auto; padding:28px 22px 90px">
+    <button onClick="{{ goBounties }}" style="background:none; border:0; color:rgba(245,234,216,0.6); font-size:13.5px; font-weight:700; cursor:pointer; padding:0; white-space:nowrap">← All bounties</button>
+    <div style="display:grid; gap:26px; grid-template-columns:{{ detailCols }}; margin-top:18px; align-items:start">
+      <div>
+        <div style="display:flex; flex-wrap:wrap; align-items:center; gap:10px">
+          <span style="background:rgba(245,234,216,0.08); border-radius:999px; padding:5px 13px; font-size:11.5px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; color:rgba(245,234,216,0.75)">{{ current.category }}</span>
+          <span style="display:inline-flex; align-items:center; gap:7px; border-radius:999px; padding:5px 13px; font-size:11.5px; font-weight:800; letter-spacing:0.07em; text-transform:uppercase; color:{{ current.statusColor }}; background:{{ current.statusBg }}"><span style="width:7px; height:7px; border-radius:999px; background:{{ current.statusColor }}"></span>{{ current.status }}</span>
+        </div>
+        <h1 style="font-size:{{ detailTitleSize }}; margin-top:14px; text-wrap:pretty">{{ current.title }}</h1>
+
+        <div style="background:#1a1615; border:1px solid rgba(245,234,216,0.1); border-radius:22px; padding:26px; margin-top:22px">
+          <h5 style="font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:rgba(245,234,216,0.45); font-family:'Figtree',sans-serif; font-weight:800">Description</h5>
+          <p style="margin-top:10px; font-size:16px; color:rgba(245,234,216,0.82)">{{ current.description }}</p>
+
+          <h5 style="font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:rgba(245,234,216,0.45); font-family:'Figtree',sans-serif; font-weight:800; margin-top:24px">Requirements</h5>
+          <div style="display:grid; gap:9px; margin-top:10px">
+            <sc-for list="{{ current.requirements }}" as="r" hint-placeholder-count="3">
+              <div style="display:flex; gap:11px; align-items:flex-start; font-size:15px; color:rgba(245,234,216,0.82)">
+                <span style="width:6px; height:6px; border-radius:999px; background:#c67139; margin-top:8px; flex:none"></span><span>{{ r.text }}</span>
+              </div>
+            </sc-for>
+          </div>
+
+          <h5 style="font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:rgba(245,234,216,0.45); font-family:'Figtree',sans-serif; font-weight:800; margin-top:24px">How to submit</h5>
+          <p style="margin-top:10px; font-size:15px; color:rgba(245,234,216,0.75)">{{ current.submitInstructions }}</p>
+        </div>
+
+        <div style="display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-top:32px">
+          <h3 style="font-size:22px">Submissions</h3>
+          <span style="font-size:13px; color:rgba(245,234,216,0.5)">{{ current.subs }}</span>
+        </div>
+        <div style="display:grid; gap:12px; margin-top:14px">
+          <sc-for list="{{ current.submissions }}" as="s" hint-placeholder-count="3">
+            <div style="background:#1a1615; border:1px solid rgba(245,234,216,0.1); border-radius:18px; padding:16px 18px; display:flex; gap:14px; align-items:center; flex-wrap:wrap">
+              <span style="width:34px; height:34px; border-radius:999px; background:{{ s.avatar }}; flex:none"></span>
+              <div style="flex:1; min-width:150px">
+                <div style="font-size:14.5px; font-weight:700; font-variant-numeric:tabular-nums">{{ s.contributor }}</div>
+                <div style="font-size:12.5px; color:rgba(245,234,216,0.5)">{{ s.when }}</div>
+              </div>
+              <span style="font-size:11.5px; font-weight:800; letter-spacing:0.07em; text-transform:uppercase; color:{{ s.color }}">{{ s.status }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <sc-if value="{{ current.noSubmissions }}" hint-placeholder-val="{{ false }}">
+          <div style="border:1px dashed rgba(245,234,216,0.16); border-radius:18px; padding:34px; text-align:center; margin-top:14px; color:rgba(245,234,216,0.6)">No one has submitted work yet.</div>
+        </sc-if>
+      </div>
+
+      <!-- reward rail -->
+      <div style="display:grid; gap:14px; position:{{ railPosition }}; top:86px">
+        <div style="background:linear-gradient(160deg,#241c18,#1a1615); border:1px solid rgba(246,160,107,0.32); border-radius:24px; padding:24px">
+          <div style="font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; font-weight:800; color:rgba(245,234,216,0.5)">Reward</div>
+          <div style="font-family:'Caprasimo',serif; font-size:46px; color:#f6a06b; line-height:1; margin-top:6px">{{ current.reward }}</div>
+          <div style="display:inline-flex; align-items:center; gap:7px; margin-top:12px; background:rgba(174,191,146,0.14); color:#c8d6ae; border-radius:999px; padding:6px 13px; font-size:11.5px; font-weight:800; letter-spacing:0.06em; text-transform:uppercase; white-space:nowrap">✓ Funded in escrow</div>
+          <div style="margin-top:18px; padding-top:16px; border-top:1px solid rgba(245,234,216,0.12)">
+            <div style="font-size:12px; letter-spacing:0.08em; text-transform:uppercase; font-weight:800; color:rgba(245,234,216,0.45)">Ends in</div>
+            <div style="font-family:'Caprasimo',serif; font-size:24px; margin-top:4px; font-variant-numeric:tabular-nums">{{ current.endsIn }}</div>
+          </div>
+          <button onClick="{{ openSubmit }}" style="width:100%; margin-top:18px; background:#c67139; color:#141110; border:0; border-radius:999px; padding:14px; font-family:'Caprasimo',serif; font-size:16px; cursor:pointer" style-hover="background:#e08a4e" style-active="background:#b2622d">Submit Work</button>
+        </div>
+
+        <div style="background:#1a1615; border:1px solid rgba(245,234,216,0.1); border-radius:20px; padding:20px">
+          <div style="font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; font-weight:800; color:rgba(245,234,216,0.45)">Created by</div>
+          <div style="display:flex; align-items:center; gap:11px; margin-top:10px">
+            <span style="width:32px; height:32px; border-radius:999px; background:#c67139"></span>
+            <div>
+              <div style="font-size:14.5px; font-weight:700; font-variant-numeric:tabular-nums">{{ current.creator }}</div>
+              <button onClick="{{ openWallet }}" style="background:none; border:0; padding:0; color:#f6a06b; font-size:12.5px; font-weight:700; cursor:pointer">View wallet</button>
+            </div>
+          </div>
+          <div style="height:1px; background:rgba(245,234,216,0.1); margin:16px 0"></div>
+          <button onClick="{{ viewOnScan }}" style="width:100%; background:transparent; border:1px solid rgba(245,234,216,0.18); color:#f5ead8; border-radius:999px; padding:11px; font-size:13.5px; font-weight:700; cursor:pointer" style-hover="border-color:#f6a06b; color:#f6a06b">View funding transaction</button>
+          <div style="margin-top:12px; font-size:11.5px; color:rgba(245,234,216,0.4); word-break:break-all; font-variant-numeric:tabular-nums">{{ current.txSig }}</div>
+        </div>
+
+        <div style="display:flex; gap:8px; flex-wrap:wrap">
+          <sc-for list="{{ shareTargets }}" as="t" hint-placeholder-count="4">
+            <button onClick="{{ t.act }}" style="flex:1; min-width:70px; background:transparent; border:1px solid rgba(245,234,216,0.14); color:rgba(245,234,216,0.75); border-radius:999px; padding:9px 10px; font-size:12.5px; font-weight:700; cursor:pointer" style-hover="border-color:#f6a06b; color:#f6a06b">{{ t.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </section>
+  </sc-if>
+
+  <!-- ══════════ CREATE ══════════ -->
+  <sc-if value="{{ isCreate }}" hint-placeholder-val="{{ false }}">
+  <section style="max-width:760px; margin:0 auto; padding:44px 22px 90px">
+    <div style="display:flex; gap:7px; margin-bottom:26px">
+      <sc-for list="{{ stepPips }}" as="p" hint-placeholder-count="5">
+        <div style="flex:1; height:4px; border-radius:999px; background:{{ p.bg }}"></div>
+      </sc-for>
+    </div>
+    <div style="font-size:12px; letter-spacing:0.1em; text-transform:uppercase; font-weight:800; color:rgba(245,234,216,0.45)">{{ stepLabel }}</div>
+
+    <sc-if value="{{ step1 }}" hint-placeholder-val="{{ true }}">
+      <div style="animation:cbPop 240ms ease both">
+        <h1 style="font-size:36px; margin-top:10px">What do you need?</h1>
+        <div style="margin-top:26px">
+          <label style="display:block; font-size:12.5px; font-weight:800; letter-spacing:0.06em; text-transform:uppercase; color:rgba(245,234,216,0.5); margin-bottom:8px">Title</label>
+          <input value="{{ form.title }}" onChange="{{ setTitle }}" placeholder="Create a Cookie Chain meme" style="width:100%; background:#1a1615; border:1px solid rgba(245,234,216,0.16); color:#f5ead8; border-radius:999px; padding:14px 20px; font-size:16px; font-family:'Figtree',sans-serif" style-focus="border-color:#f6a06b">
+        </div>
+        <div style="margin-top:20px">
+          <label style="display:block; font-size:12.5px; font-weight:800; letter-spacing:0.06em; text-transform:uppercase; color:rgba(245,234,216,0.5); margin-bottom:8px">Description</label>
+          <textarea rows="5" value="{{ form.description }}" onChange="{{ setDescription }}" placeholder="Create a high-quality meme promoting Cookie Chain that can be posted on X." style="width:100%; background:#1a1615; border:1px solid rgba(245,234,216,0.16); color:#f5ead8; border-radius:20px; padding:14px 18px; font-size:15.5px; font-family:'Figtree',sans-serif; resize:vertical" style-focus="border-color:#f6a06b"></textarea>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ step2 }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:cbPop 240ms ease both">
+        <h1 style="font-size:36px; margin-top:10px">How much is it worth?</h1>
+        <div style="display:flex; align-items:center; gap:14px; margin-top:26px; background:#1a1615; border:1px solid rgba(246,160,107,0.4); border-radius:24px; padding:22px 24px">
+          <input value="{{ form.reward }}" onChange="{{ setReward }}" inputMode="decimal" style="flex:1; min-width:0; background:transparent; border:0; color:#f6a06b; font-family:'Caprasimo',serif; font-size:44px; outline:none">
+          <span style="font-family:'Caprasimo',serif; font-size:24px; color:rgba(245,234,216,0.6)">COOK</span>
+        </div>
+        <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap">
+          <sc-for list="{{ rewardPresets }}" as="r" hint-placeholder-count="4">
+            <button onClick="{{ r.select }}" style="background:rgba(245,234,216,0.07); border:1px solid rgba(245,234,216,0.14); color:#f5ead8; border-radius:999px; padding:8px 16px; font-size:13.5px; font-weight:700; cursor:pointer" style-hover="border-color:#f6a06b; color:#f6a06b">{{ r.label }}</button>
+          </sc-for>
+        </div>
+        <div style="background:#1a1615; border:1px solid rgba(245,234,216,0.1); border-radius:20px; padding:20px; margin-top:22px; display:grid; gap:10px">
+          <div style="display:flex; justify-content:space-between; font-size:14.5px"><span style="color:rgba(245,234,216,0.6)">Your balance</span><span style="font-weight:700; font-variant-numeric:tabular-nums">{{ balanceLabel }}</span></div>
+          <div style="display:flex; justify-content:space-between; font-size:14.5px"><span style="color:rgba(245,234,216,0.6)">Locked in escrow</span><span style="font-weight:700; color:#f6a06b; font-variant-numeric:tabular-nums">−{{ form.reward }} COOK</span></div>
+          <div style="height:1px; background:rgba(245,234,216,0.1)"></div>
+          <div style="display:flex; justify-content:space-between; font-size:15.5px"><span style="color:rgba(245,234,216,0.6)">After funding</span><span style="font-family:'Caprasimo',serif; font-size:18px; font-variant-numeric:tabular-nums">{{ afterFunding }}</span></div>
+        </div>
+        <sc-if value="{{ insufficient }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:14px; background:rgba(212,115,94,0.12); border:1px solid rgba(212,115,94,0.45); color:#e8a08d; border-radius:16px; padding:14px 18px; font-size:14px">Your wallet doesn't have enough COOK to fund this bounty.</div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ step3 }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:cbPop 240ms ease both">
+        <h1 style="font-size:36px; margin-top:10px">When should it end?</h1>
+        <div style="display:grid; gap:10px; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); margin-top:26px">
+          <sc-for list="{{ deadlines }}" as="d" hint-placeholder-count="4">
+            <button onClick="{{ d.select }}" style="background:{{ d.bg }}; border:1px solid {{ d.border }}; color:#f5ead8; border-radius:20px; padding:20px; cursor:pointer; text-align:left" style-hover="border-color:rgba(246,160,107,0.6)">
+              <div style="font-family:'Caprasimo',serif; font-size:22px; color:{{ d.color }}">{{ d.label }}</div>
+              <div style="font-size:12.5px; color:rgba(245,234,216,0.5); margin-top:4px">{{ d.sub }}</div>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ step4 }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:cbPop 240ms ease both">
+        <h1 style="font-size:36px; margin-top:10px">Pick a category</h1>
+        <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:26px">
+          <sc-for list="{{ createCategories }}" as="c" hint-placeholder-count="7">
+            <button onClick="{{ c.select }}" style="background:{{ c.bg }}; border:1px solid {{ c.border }}; color:{{ c.color }}; border-radius:999px; padding:12px 22px; font-size:15px; font-weight:700; cursor:pointer" style-hover="border-color:rgba(246,160,107,0.6)">{{ c.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ step5 }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:cbPop 240ms ease both">
+        <h1 style="font-size:36px; margin-top:10px">Review &amp; fund</h1>
+        <div style="background:#1a1615; border:1px solid rgba(245,234,216,0.12); border-radius:24px; padding:26px; margin-top:22px">
+          <h3 style="font-size:26px; text-wrap:pretty">{{ reviewTitle }}</h3>
+          <p style="margin-top:10px; color:rgba(245,234,216,0.7); font-size:15px">{{ reviewDescription }}</p>
+          <div style="display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); margin-top:24px; padding-top:20px; border-top:1px solid rgba(245,234,216,0.1)">
+            <sc-for list="{{ reviewRows }}" as="r" hint-placeholder-count="4">
+              <div>
+                <div style="font-size:11.5px; letter-spacing:0.09em; text-transform:uppercase; font-weight:800; color:rgba(245,234,216,0.45)">{{ r.label }}</div>
+                <div style="font-family:'Caprasimo',serif; font-size:20px; margin-top:4px; color:{{ r.color }}">{{ r.value }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="background:rgba(246,160,107,0.08); border:1px solid rgba(246,160,107,0.3); border-radius:20px; padding:18px 20px; margin-top:16px; font-size:14px; color:rgba(245,234,216,0.8)">
+          <strong style="color:#f6a06b">You are funding escrow.</strong> {{ escrowNotice }}
+        </div>
+      </div>
+    </sc-if>
+
+    <div style="display:flex; gap:12px; margin-top:30px; align-items:center">
+      <sc-if value="{{ canGoBack }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ prevStep }}" style="background:transparent; border:1px solid rgba(245,234,216,0.2); color:#f5ead8; border-radius:999px; padding:13px 24px; font-size:14.5px; font-weight:700; cursor:pointer" style-hover="background:rgba(245,234,216,0.07)">Back</button>
+      </sc-if>
+      <div style="flex:1"></div>
+      <button onClick="{{ nextStep }}" style="background:#c67139; color:#141110; border:0; border-radius:999px; padding:14px 28px; font-family:'Caprasimo',serif; font-size:16px; cursor:pointer" style-hover="background:#e08a4e" style-active="background:#b2622d">{{ nextLabel }}</button>
+    </div>
+  </section>
+  </sc-if>
+
+  <!-- ══════════ MY BOUNTIES ══════════ -->
+  <sc-if value="{{ isMyBounties }}" hint-placeholder-val="{{ false }}">
+  <section style="max-width:1220px; margin:0 auto; padding:44px 22px 90px">
+    <h1 style="font-size:40px">My bounties</h1>
+    <div style="display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); margin-top:24px">
+      <sc-for list="{{ creatorStats }}" as="s" hint-placeholder-count="5">
+        <div style="background:#1a1615; border:1px solid rgba(245,234,216,0.1); border-radius:18px; padding:18px 20px">
+          <div style="font-family:'Caprasimo',serif; font-size:30px; color:{{ s.color }}; font-variant-numeric:tabular-nums">{{ s.value }}</div>
+          <div style="font-size:11.5px; letter-spacing:0.09em; text-transform:uppercase; font-weight:800; color:rgba(245,234,216,0.5); margin-top:4px">{{ s.label }}</div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="background:#1a1615; border:1px solid rgba(245,234,216,0.1); border-radius:22px; margin-top:26px; overflow:hidden">
+      <sc-for list="{{ myBounties }}" as="b" hint-placeholder-count="4">
+        <div style="display:flex; flex-wrap:wrap; align-items:center; gap:14px; padding:18px 22px; border-bottom:1px solid rgba(245,234,216,0.08)">
+          <div style="flex:2; min-width:180px">
+            <div style="font-size:15.5px; font-weight:700; text-wrap:pretty">{{ b.title }}</div>
+            <div style="font-size:12.5px; color:rgba(245,234,216,0.5); margin-top:3px">{{ b.category }} · {{ b.subs }}</div>
+          </div>
+          <div style="flex:1; min-width:90px; font-family:'Caprasimo',serif; font-size:20px; color:#f6a06b">{{ b.reward }}</div>
+          <div style="flex:1; min-width:90px; font-size:13.5px; color:rgba(245,234,216,0.6); font-variant-numeric:tabular-nums">{{ b.ends }}</div>
+          <div style="flex:1; min-width:110px"><span style="display:inline-flex; align-items:center; gap:7px; font-size:11.5px; font-weight:800; letter-spacing:0.07em; text-transform:uppercase; color:{{ b.statusColor }}"><span style="width:7px; height:7px; border-radius:999px; background:{{ b.statusColor }}"></span>{{ b.status }}</span></div>
+          <button onClick="{{ b.review }}" style="background:{{ b.actionBg }}; color:{{ b.actionColor }}; border:1px solid {{ b.actionBorder }}; border-radius:999px; padding:9px 20px; font-size:13.5px; font-weight:700; cursor:pointer" style-hover="border-color:#f6a06b">{{ b.action }}</button>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+  </sc-if>
+
+  <!-- ══════════ REVIEW SUBMISSIONS ══════════ -->
+  <sc-if value="{{ isReview }}" hint-placeholder-val="{{ false }}">
+  <section style="max-width:900px; margin:0 auto; padding:32px 22px 90px">
+    <button onClick="{{ goMyBounties }}" style="background:none; border:0; color:rgba(245,234,216,0.6); font-size:13.5px; font-weight:700; cursor:pointer; padding:0; white-space:nowrap">← My bounties</button>
+    <h1 style="font-size:38px; margin-top:14px">Review submissions</h1>
+    <div style="display:flex; flex-wrap:wrap; align-items:center; gap:14px; margin-top:12px">
+      <span style="font-size:16px; color:rgba(245,234,216,0.7)">{{ current.title }}</span>
+      <span style="font-family:'Caprasimo',serif; font-size:18px; color:#f6a06b">{{ current.reward }}</span>
+      <span style="display:inline-flex; align-items:center; gap:7px; background:rgba(174,191,146,0.14); color:#c8d6ae; border-radius:999px; padding:5px 13px; font-size:11.5px; font-weight:800; letter-spacing:0.06em; text-transform:uppercase; white-space:nowrap">✓ In escrow</span>
+    </div>
+
+    <div style="display:grid; gap:16px; margin-top:26px">
+      <sc-for list="{{ reviewSubmissions }}" as="s" hint-placeholder-count="3">
+        <div style="background:#1a1615; border:1px solid {{ s.cardBorder }}; border-radius:22px; padding:22px 24px">
+          <div style="display:flex; flex-wrap:wrap; align-items:center; gap:12px">
+            <span style="width:36px; height:36px; border-radius:999px; background:{{ s.avatar }}"></span>
+            <div style="flex:1; min-width:150px">
+              <div style="font-size:15px; font-weight:700; font-variant-numeric:tabular-nums">{{ s.contributor }}</div>
+              <div style="font-size:12.5px; color:rgba(245,234,216,0.5)">Submission {{ s.num }} · {{ s.when }}</div>
+            </div>
+            <span style="font-size:11.5px; font-weight:800; letter-spacing:0.07em; text-transform:uppercase; color:{{ s.color }}">{{ s.status }}</span>
+          </div>
+          <p style="margin-top:14px; font-size:15px; color:rgba(245,234,216,0.8)">{{ s.note }}</p>
+          <div style="margin-top:12px; font-size:13px; color:#f6a06b; word-break:break-all">{{ s.url }}</div>
+          <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:18px">
+            <button onClick="{{ s.openWork }}" style="background:transparent; border:1px solid rgba(245,234,216,0.2); color:#f5ead8; border-radius:999px; padding:10px 20px; font-size:13.5px; font-weight:700; cursor:pointer" style-hover="background:rgba(245,234,216,0.07)">Open work</button>
+            <div style="flex:1"></div>
+            <button onClick="{{ s.reject }}" style="background:transparent; border:1px solid rgba(212,115,94,0.45); color:#e8a08d; border-radius:999px; padding:10px 20px; font-size:13.5px; font-weight:700; cursor:pointer" style-hover="background:rgba(212,115,94,0.12)">Reject</button>
+            <button onClick="{{ s.approve }}" style="background:#aebf92; color:#141110; border:0; border-radius:999px; padding:10px 24px; font-family:'Caprasimo',serif; font-size:14.5px; cursor:pointer" style-hover="background:#c8d6ae">Approve &amp; Pay</button>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+  </sc-if>
+
+  <!-- ══════════ MY WORK ══════════ -->
+  <sc-if value="{{ isMyWork }}" hint-placeholder-val="{{ false }}">
+  <section style="max-width:1220px; margin:0 auto; padding:44px 22px 90px">
+    <h1 style="font-size:40px">My work</h1>
+    <div style="display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); margin-top:24px">
+      <sc-for list="{{ workStats }}" as="s" hint-placeholder-count="4">
+        <div style="background:#1a1615; border:1px solid rgba(245,234,216,0.1); border-radius:18px; padding:18px 20px">
+          <div style="font-family:'Caprasimo',serif; font-size:30px; color:{{ s.color }}; font-variant-numeric:tabular-nums">{{ s.value }}</div>
+          <div style="font-size:11.5px; letter-spacing:0.09em; text-transform:uppercase; font-weight:800; color:rgba(245,234,216,0.5); margin-top:4px">{{ s.label }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display:grid; gap:14px; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); margin-top:26px">
+      <sc-for list="{{ myWork }}" as="w" hint-placeholder-count="4">
+        <div style="background:#1a1615; border:1px solid rgba(245,234,216,0.1); border-radius:20px; padding:20px; display:flex; flex-direction:column; gap:10px">
+          <span style="display:inline-flex; align-items:center; gap:7px; font-size:11px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; color:{{ w.color }}"><span style="width:6px; height:6px; border-radius:999px; background:{{ w.color }}"></span>{{ w.status }}</span>
+          <div style="font-size:16px; font-weight:700; text-wrap:pretty">{{ w.title }}</div>
+          <div style="font-family:'Caprasimo',serif; font-size:26px; color:#f6a06b">{{ w.reward }}</div>
+          <div style="font-size:12.5px; color:rgba(245,234,216,0.5)">{{ w.when }} · by {{ w.creator }}</div>
+          <button onClick="{{ w.view }}" style="margin-top:4px; background:transparent; border:1px solid rgba(245,234,216,0.18); color:#f5ead8; border-radius:999px; padding:10px; font-size:13.5px; font-weight:700; cursor:pointer" style-hover="border-color:#f6a06b; color:#f6a06b">View</button>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+  </sc-if>
+
+  <!-- ══════════ ACTIVITY ══════════ -->
+  <sc-if value="{{ isActivity }}" hint-placeholder-val="{{ false }}">
+  <section style="max-width:820px; margin:0 auto; padding:44px 22px 90px">
+    <div style="display:flex; align-items:center; gap:12px">
+      <span style="width:9px; height:9px; border-radius:999px; background:#aebf92; animation:cbPulse 1.6s ease-in-out infinite"></span>
+      <h1 style="font-size:38px">Live on Cookie Chain</h1>
+    </div>
+    <p style="margin-top:10px; color:rgba(245,234,216,0.65); font-size:16.5px">Every funding, submission and payout as the community makes it.</p>
+    <div style="display:grid; gap:12px; margin-top:26px">
+      <sc-for list="{{ activityFeed }}" as="a" hint-placeholder-count="6">
+        <div style="background:#1a1615; border:1px solid rgba(245,234,216,0.1); border-radius:20px; padding:18px 20px; display:flex; gap:16px; align-items:flex-start; animation:cbIn 380ms ease both; transition:border-color 200ms ease" style-hover="border-color:rgba(246,160,107,0.4)">
+          <span style="width:38px; height:38px; border-radius:999px; background:{{ a.tint }}; display:grid; place-items:center; flex:none"><span style="width:10px; height:10px; border-radius:999px; background:{{ a.color }}"></span></span>
+          <div style="flex:1; min-width:0">
+            <div style="font-size:11px; letter-spacing:0.09em; text-transform:uppercase; font-weight:800; color:{{ a.color }}">{{ a.kind }}</div>
+            <div style="font-size:16px; font-weight:700; margin-top:5px; text-wrap:pretty">{{ a.title }}</div>
+            <div style="font-size:13.5px; color:rgba(245,234,216,0.6); margin-top:4px">{{ a.detail }}</div>
+          </div>
+          <div style="text-align:right; flex:none">
+            <div style="font-family:'Caprasimo',serif; font-size:17px; color:#f6a06b">{{ a.amount }}</div>
+            <div style="font-size:12px; color:rgba(245,234,216,0.45); margin-top:4px; font-variant-numeric:tabular-nums">{{ a.ago }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+  </sc-if>
+
+  <!-- ══════════ LEADERBOARD ══════════ -->
+  <sc-if value="{{ isLeaderboard }}" hint-placeholder-val="{{ false }}">
+  <section style="max-width:900px; margin:0 auto; padding:44px 22px 90px">
+    <h1 style="font-size:40px">Cookie builders</h1>
+    <p style="margin-top:10px; color:rgba(245,234,216,0.65); font-size:16.5px">The people actually building.</p>
+    <div style="background:#1a1615; border:1px solid rgba(245,234,216,0.1); border-radius:22px; margin-top:26px; overflow:hidden">
+      <sc-for list="{{ leaderboard }}" as="l" hint-placeholder-count="6">
+        <div style="display:flex; flex-wrap:wrap; align-items:center; gap:16px; padding:16px 22px; border-bottom:1px solid rgba(245,234,216,0.08)">
+          <span style="font-family:'Caprasimo',serif; font-size:20px; color:{{ l.rankColor }}; width:34px; font-variant-numeric:tabular-nums">{{ l.rank }}</span>
+          <span style="width:34px; height:34px; border-radius:999px; background:{{ l.avatar }}; flex:none"></span>
+          <div style="flex:1; min-width:120px; font-size:15px; font-weight:700; font-variant-numeric:tabular-nums">{{ l.address }}</div>
+          <div style="font-size:13.5px; color:rgba(245,234,216,0.6); min-width:110px">{{ l.completed }}</div>
+          <div style="font-family:'Caprasimo',serif; font-size:19px; color:#f6a06b; min-width:100px; text-align:right">{{ l.earned }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+  </sc-if>
+
+  <!-- ══════════ DOCS ══════════ -->
+  <sc-if value="{{ isDocs }}" hint-placeholder-val="{{ false }}">
+  <section style="max-width:980px; margin:0 auto; padding:44px 22px 90px">
+    <h1 style="font-size:40px">Docs</h1>
+    <p style="margin-top:10px; color:rgba(245,234,216,0.65); font-size:16.5px">What Cookie Bounties is, and exactly what the chain guarantees.</p>
+
+    <div style="background:#1a1615; border:1px solid rgba(246,160,107,0.28); border-radius:24px; padding:28px; margin-top:26px">
+      <h3 style="font-size:24px">How escrow works</h3>
+      <div style="display:grid; gap:12px; margin-top:18px; max-width:420px">
+        <sc-for list="{{ escrowDiagram }}" as="d" hint-placeholder-count="3">
+          <div style="border:1px solid {{ d.border }}; background:{{ d.bg }}; border-radius:18px; padding:16px 18px; display:flex; justify-content:space-between; align-items:center; gap:12px">
+            <div>
+              <div style="font-size:14.5px; font-weight:700">{{ d.title }}</div>
+              <div style="font-size:12.5px; color:rgba(245,234,216,0.55)">{{ d.sub }}</div>
+            </div>
+            <div style="font-family:'Caprasimo',serif; font-size:17px; color:{{ d.color }}">{{ d.amount }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <p style="margin-top:16px; font-size:14px; color:rgba(245,234,216,0.6)">Funds are held by the Cookie Bounties program until the bounty is resolved.</p>
+    </div>
+
+    <div style="display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); margin-top:20px">
+      <sc-for list="{{ docSections }}" as="d" hint-placeholder-count="6">
+        <div style="background:#1a1615; border:1px solid rgba(245,234,216,0.1); border-radius:20px; padding:22px">
+          <h4 style="font-size:19px">{{ d.title }}</h4>
+          <p style="margin-top:8px; font-size:14.5px; color:rgba(245,234,216,0.68)">{{ d.body }}</p>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="background:#1a1615; border:1px solid rgba(245,234,216,0.1); border-radius:22px; padding:24px; margin-top:20px">
+      <h4 style="font-size:19px">Bounty lifecycle</h4>
+      <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:14px">
+        <sc-for list="{{ lifecycle }}" as="l" hint-placeholder-count="6">
+          <span style="border:1px solid {{ l.border }}; color:{{ l.color }}; background:{{ l.bg }}; border-radius:999px; padding:7px 15px; font-size:12px; font-weight:800; letter-spacing:0.07em; text-transform:uppercase">{{ l.label }}</span>
+        </sc-for>
+      </div>
+      <p style="margin-top:14px; font-size:14px; color:rgba(245,234,216,0.6)">The program rejects any transition outside this machine — no double payment, no unauthorized approval, no refund after payout.</p>
+    </div>
+  </section>
+  </sc-if>
+
+  <!-- ─── mobile tab bar ─── -->
+  <sc-if value="{{ narrow }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; left:0; right:0; bottom:0; z-index:45; background:rgba(20,17,16,0.94); backdrop-filter:blur(14px); border-top:1px solid rgba(245,234,216,0.12); display:flex; align-items:center; padding:8px 8px calc(8px + env(safe-area-inset-bottom))">
+      <sc-for list="{{ mobileTabs }}" as="t" hint-placeholder-count="5">
+        <button onClick="{{ t.go }}" style="flex:1; background:none; border:0; padding:8px 2px; cursor:pointer; color:{{ t.color }}; font-size:11px; font-weight:800; letter-spacing:0.04em; text-transform:uppercase; display:grid; gap:5px; justify-items:center">
+          <span style="width:8px; height:8px; border-radius:999px; background:{{ t.dot }}"></span>{{ t.label }}
+        </button>
+      </sc-for>
+      <button onClick="{{ goCreate }}" style="flex:none; margin-left:6px; width:46px; height:46px; border-radius:999px; background:#c67139; color:#141110; border:0; font-size:24px; line-height:1; cursor:pointer; font-family:'Caprasimo',serif">+</button>
+    </div>
+  </sc-if>
+
+  <!-- ══════════ MODALS ══════════ -->
+  <sc-if value="{{ hasModal }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ closeModal }}" style="position:fixed; inset:0; z-index:60; background:rgba(10,8,8,0.72); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; padding:20px; overflow:auto">
+    <div onClick="{{ stopProp }}" style="width:100%; max-width:{{ modalWidth }}; background:#1a1615; border:1px solid rgba(245,234,216,0.14); border-radius:26px; padding:28px; animation:cbPop 220ms ease both; max-height:92vh; overflow:auto">
+
+      <!-- fund confirmation -->
+      <sc-if value="{{ modalFund }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <h3 style="font-size:26px">Fund bounty</h3>
+          <p style="margin-top:8px; font-size:14.5px; color:rgba(245,234,216,0.62)">You are depositing into the Cookie Bounties escrow — a program-derived account. No backend wallet ever holds your COOK.</p>
+          <div style="text-align:center; background:#141110; border:1px solid rgba(246,160,107,0.35); border-radius:22px; padding:24px; margin-top:20px">
+            <div style="font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; font-weight:800; color:rgba(245,234,216,0.45)">Depositing</div>
+            <div style="font-family:'Caprasimo',serif; font-size:46px; color:#f6a06b; margin-top:6px">{{ fundAmountLabel }}</div>
+          </div>
+          <div style="display:grid; gap:10px; margin-top:18px">
+            <sc-for list="{{ fundRows }}" as="r" hint-placeholder-count="4">
+              <div style="display:flex; justify-content:space-between; gap:12px; font-size:14.5px"><span style="color:rgba(245,234,216,0.6)">{{ r.label }}</span><span style="font-weight:700; font-variant-numeric:tabular-nums; color:{{ r.color }}">{{ r.value }}</span></div>
+            </sc-for>
+          </div>
+          <button onClick="{{ confirmFund }}" style="width:100%; margin-top:22px; background:#c67139; color:#141110; border:0; border-radius:999px; padding:15px; font-family:'Caprasimo',serif; font-size:16px; cursor:pointer" style-hover="background:#e08a4e">Confirm in Nightly</button>
+          <button onClick="{{ closeModal }}" style="width:100%; margin-top:10px; background:none; border:0; color:rgba(245,234,216,0.55); font-size:13.5px; font-weight:700; cursor:pointer; padding:8px">Cancel</button>
+        </div>
+      </sc-if>
+
+      <!-- approve confirmation -->
+      <sc-if value="{{ modalApprove }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <h3 style="font-size:26px">Release reward?</h3>
+          <p style="margin-top:8px; font-size:14.5px; color:rgba(245,234,216,0.62)">You are releasing escrow. This action completes the bounty and cannot be reversed.</p>
+          <div style="text-align:center; background:#141110; border:1px solid rgba(174,191,146,0.4); border-radius:22px; padding:24px; margin-top:20px">
+            <div style="font-family:'Caprasimo',serif; font-size:46px; color:#f6a06b">{{ current.reward }}</div>
+            <div style="font-size:13.5px; color:rgba(245,234,216,0.55); margin-top:8px">to</div>
+            <div style="font-family:'Caprasimo',serif; font-size:22px; margin-top:4px; font-variant-numeric:tabular-nums">{{ approveTarget }}</div>
+          </div>
+          <button onClick="{{ confirmApprove }}" style="width:100%; margin-top:22px; background:#aebf92; color:#141110; border:0; border-radius:999px; padding:15px; font-family:'Caprasimo',serif; font-size:16px; cursor:pointer" style-hover="background:#c8d6ae">Approve &amp; Pay</button>
+          <button onClick="{{ closeModal }}" style="width:100%; margin-top:10px; background:none; border:0; color:rgba(245,234,216,0.55); font-size:13.5px; font-weight:700; cursor:pointer; padding:8px">Cancel</button>
+        </div>
+      </sc-if>
+
+      <!-- transaction progress -->
+      <sc-if value="{{ modalTx }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <h3 style="font-size:24px">{{ txTitle }}</h3>
+          <div style="display:grid; gap:2px; margin-top:22px">
+            <sc-for list="{{ txSteps }}" as="s" hint-placeholder-count="5">
+              <div style="display:flex; align-items:center; gap:14px; padding:11px 0">
+                <span style="width:22px; height:22px; border-radius:999px; border:2px solid {{ s.ring }}; background:{{ s.fill }}; display:grid; place-items:center; flex:none; color:#141110; font-size:12px; font-weight:800">{{ s.mark }}</span>
+                <span style="font-size:15px; font-weight:{{ s.weight }}; color:{{ s.color }}">{{ s.label }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <sc-if value="{{ txDone }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:18px; background:#141110; border:1px solid rgba(174,191,146,0.4); border-radius:20px; padding:20px; text-align:center">
+              <div style="font-family:'Caprasimo',serif; font-size:24px; color:#aebf92">{{ txResultTitle }}</div>
+              <div style="font-size:14px; color:rgba(245,234,216,0.65); margin-top:6px">{{ txResultDetail }}</div>
+              <button onClick="{{ viewOnScan }}" style="margin-top:14px; background:transparent; border:1px solid rgba(245,234,216,0.2); color:#f5ead8; border-radius:999px; padding:10px 20px; font-size:13.5px; font-weight:700; cursor:pointer" style-hover="border-color:#f6a06b; color:#f6a06b">View on CookieScan</button>
+            </div>
+            <button onClick="{{ txContinue }}" style="width:100%; margin-top:14px; background:#c67139; color:#141110; border:0; border-radius:999px; padding:14px; font-family:'Caprasimo',serif; font-size:15.5px; cursor:pointer" style-hover="background:#e08a4e">{{ txContinueLabel }}</button>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <!-- bounty live success -->
+      <sc-if value="{{ modalSuccess }}" hint-placeholder-val="{{ false }}">
+        <div style="text-align:center">
+          <div style="width:62px; height:62px; border-radius:999px; background:rgba(174,191,146,0.18); color:#aebf92; display:grid; place-items:center; margin:0 auto; font-size:28px; animation:cbGlow 1.8s ease-out infinite">✓</div>
+          <h3 style="font-size:30px; margin-top:16px">Bounty live</h3>
+          <p style="margin-top:10px; color:rgba(245,234,216,0.7); font-size:15.5px">Your {{ fundAmountLabel }} reward is secured in escrow and your bounty is visible to the Cookie Chain community.</p>
+          <div style="display:flex; gap:10px; margin-top:22px; flex-wrap:wrap">
+            <button onClick="{{ viewCreated }}" style="flex:1; min-width:130px; background:#c67139; color:#141110; border:0; border-radius:999px; padding:13px; font-family:'Caprasimo',serif; font-size:15px; cursor:pointer" style-hover="background:#e08a4e">View Bounty</button>
+            <button onClick="{{ shareBounty }}" style="flex:1; min-width:130px; background:transparent; border:1px solid rgba(245,234,216,0.2); color:#f5ead8; border-radius:999px; padding:13px; font-family:'Caprasimo',serif; font-size:15px; cursor:pointer" style-hover="border-color:#f6a06b; color:#f6a06b">Share Bounty</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- submit work -->
+      <sc-if value="{{ modalSubmit }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <h3 style="font-size:26px">Submit your work</h3>
+          <p style="margin-top:8px; font-size:14.5px; color:rgba(245,234,216,0.62)">{{ current.title }} · {{ current.reward }}</p>
+          <div style="margin-top:20px">
+            <label style="display:block; font-size:12.5px; font-weight:800; letter-spacing:0.06em; text-transform:uppercase; color:rgba(245,234,216,0.5); margin-bottom:8px">Work URL</label>
+            <input value="{{ submission.url }}" onChange="{{ setSubUrl }}" placeholder="https://..." style="width:100%; background:#141110; border:1px solid rgba(245,234,216,0.16); color:#f5ead8; border-radius:999px; padding:13px 18px; font-size:15px; font-family:'Figtree',sans-serif" style-focus="border-color:#f6a06b">
+          </div>
+          <div style="margin-top:16px">
+            <label style="display:block; font-size:12.5px; font-weight:800; letter-spacing:0.06em; text-transform:uppercase; color:rgba(245,234,216,0.5); margin-bottom:8px">Tell the creator about your submission</label>
+            <textarea rows="4" value="{{ submission.note }}" onChange="{{ setSubNote }}" placeholder="I created three variations..." style="width:100%; background:#141110; border:1px solid rgba(245,234,216,0.16); color:#f5ead8; border-radius:20px; padding:13px 18px; font-size:15px; font-family:'Figtree',sans-serif; resize:vertical" style-focus="border-color:#f6a06b"></textarea>
+          </div>
+          <div style="margin-top:14px; font-size:13px; color:rgba(245,234,216,0.5)">Files live off-chain — only the reference and your wallet are recorded on Cookie Chain.</div>
+          <button onClick="{{ confirmSubmit }}" style="width:100%; margin-top:20px; background:#c67139; color:#141110; border:0; border-radius:999px; padding:15px; font-family:'Caprasimo',serif; font-size:16px; cursor:pointer" style-hover="background:#e08a4e">Submit Work</button>
+        </div>
+      </sc-if>
+
+      <!-- submission received -->
+      <sc-if value="{{ modalSubmitted }}" hint-placeholder-val="{{ false }}">
+        <div style="text-align:center">
+          <div style="width:62px; height:62px; border-radius:999px; background:rgba(174,191,146,0.18); color:#aebf92; display:grid; place-items:center; margin:0 auto; font-size:28px">✓</div>
+          <h3 style="font-size:28px; margin-top:16px">Submission received</h3>
+          <p style="margin-top:10px; color:rgba(245,234,216,0.7); font-size:15.5px">Your work has been submitted to {{ current.title }}.</p>
+          <div style="display:flex; justify-content:center; gap:26px; margin-top:20px">
+            <div><div style="font-size:11.5px; letter-spacing:0.09em; text-transform:uppercase; font-weight:800; color:rgba(245,234,216,0.45)">Reward</div><div style="font-family:'Caprasimo',serif; font-size:22px; color:#f6a06b; margin-top:4px">{{ current.reward }}</div></div>
+            <div><div style="font-size:11.5px; letter-spacing:0.09em; text-transform:uppercase; font-weight:800; color:rgba(245,234,216,0.45)">Status</div><div style="font-family:'Caprasimo',serif; font-size:22px; color:#e2b04a; margin-top:4px">Awaiting review</div></div>
+          </div>
+          <button onClick="{{ goMyWorkClose }}" style="width:100%; margin-top:22px; background:#c67139; color:#141110; border:0; border-radius:999px; padding:14px; font-family:'Caprasimo',serif; font-size:15.5px; cursor:pointer" style-hover="background:#e08a4e">Go to My Work</button>
+        </div>
+      </sc-if>
+
+      <!-- bounty completed -->
+      <sc-if value="{{ modalCompleted }}" hint-placeholder-val="{{ false }}">
+        <div style="text-align:center">
+          <div style="font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; font-weight:800; color:#aebf92">Bounty completed</div>
+          <div style="font-family:'Caprasimo',serif; font-size:56px; color:#f6a06b; margin-top:10px; animation:cbPop 420ms ease both">{{ current.reward }}</div>
+          <div style="display:grid; gap:8px; margin-top:18px; justify-items:center">
+            <sc-for list="{{ payoutTrail }}" as="p" hint-placeholder-count="3">
+              <div style="width:100%; background:#141110; border:1px solid {{ p.border }}; border-radius:16px; padding:12px 16px; display:flex; justify-content:space-between; font-size:14px"><span style="color:rgba(245,234,216,0.6)">{{ p.label }}</span><span style="font-weight:700; color:{{ p.color }}; font-variant-numeric:tabular-nums">{{ p.value }}</span></div>
+            </sc-for>
+          </div>
+          <div style="display:flex; gap:10px; margin-top:20px; flex-wrap:wrap">
+            <button onClick="{{ goActivityClose }}" style="flex:1; min-width:130px; background:#c67139; color:#141110; border:0; border-radius:999px; padding:13px; font-family:'Caprasimo',serif; font-size:15px; cursor:pointer" style-hover="background:#e08a4e">View Activity</button>
+            <button onClick="{{ goCreateClose }}" style="flex:1; min-width:130px; background:transparent; border:1px solid rgba(245,234,216,0.2); color:#f5ead8; border-radius:999px; padding:13px; font-family:'Caprasimo',serif; font-size:15px; cursor:pointer" style-hover="border-color:#f6a06b; color:#f6a06b">Create Another</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- wallet panel -->
+      <sc-if value="{{ modalWallet }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <div style="display:flex; align-items:center; gap:14px">
+            <span style="width:46px; height:46px; border-radius:999px; background:#c67139"></span>
+            <div style="flex:1; min-width:0">
+              <div style="font-family:'Caprasimo',serif; font-size:22px; font-variant-numeric:tabular-nums">{{ shortAddress }}</div>
+              <div style="font-size:12px; color:rgba(245,234,216,0.45); word-break:break-all; font-variant-numeric:tabular-nums">{{ fullAddress }}</div>
+            </div>
+            <button onClick="{{ copyAddress }}" style="background:transparent; border:1px solid rgba(245,234,216,0.18); color:#f5ead8; border-radius:999px; padding:8px 14px; font-size:12.5px; font-weight:700; cursor:pointer; flex:none" style-hover="border-color:#f6a06b; color:#f6a06b">{{ copyLabel }}</button>
+          </div>
+          <div style="background:#141110; border:1px solid rgba(246,160,107,0.3); border-radius:20px; padding:20px; margin-top:18px; text-align:center">
+            <div style="font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; font-weight:800; color:rgba(245,234,216,0.45)">COOK balance</div>
+            <div style="font-family:'Caprasimo',serif; font-size:38px; color:#f6a06b; margin-top:4px">{{ balanceLabel }}</div>
+            <button onClick="{{ openGetCook }}" style="margin-top:12px; background:transparent; border:1px solid rgba(245,234,216,0.2); color:#f5ead8; border-radius:999px; padding:9px 18px; font-size:13px; font-weight:700; cursor:pointer" style-hover="border-color:#f6a06b; color:#f6a06b">Get COOK — Hyperlane bridge</button>
+          </div>
+          <div style="display:grid; gap:10px; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); margin-top:16px">
+            <sc-for list="{{ walletStats }}" as="s" hint-placeholder-count="3">
+              <div style="background:#141110; border:1px solid rgba(245,234,216,0.1); border-radius:16px; padding:14px">
+                <div style="font-family:'Caprasimo',serif; font-size:20px; color:{{ s.color }}">{{ s.value }}</div>
+                <div style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; font-weight:800; color:rgba(245,234,216,0.45); margin-top:3px">{{ s.label }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px; margin-top:16px; font-size:13px; color:rgba(245,234,216,0.55)">
+            <span style="width:8px; height:8px; border-radius:999px; background:{{ networkColor }}"></span>{{ networkLabel }}
+          </div>
+          <button onClick="{{ disconnect }}" style="width:100%; margin-top:16px; background:transparent; border:1px solid rgba(212,115,94,0.4); color:#e8a08d; border-radius:999px; padding:12px; font-size:13.5px; font-weight:700; cursor:pointer" style-hover="background:rgba(212,115,94,0.12)">Disconnect</button>
+        </div>
+      </sc-if>
+
+      <!-- wrong network / no wallet -->
+      <sc-if value="{{ modalNetwork }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <h3 style="font-size:24px; color:#e2b04a">{{ networkModalTitle }}</h3>
+          <p style="margin-top:10px; font-size:15px; color:rgba(245,234,216,0.72)">{{ networkModalBody }}</p>
+          <div style="background:#141110; border:1px solid rgba(245,234,216,0.12); border-radius:16px; padding:14px 16px; margin-top:16px; font-size:13px; color:rgba(245,234,216,0.6); word-break:break-all">RPC · https://rpc.cookiescan.io</div>
+          <button onClick="{{ networkAction }}" style="width:100%; margin-top:18px; background:#c67139; color:#141110; border:0; border-radius:999px; padding:14px; font-family:'Caprasimo',serif; font-size:15.5px; cursor:pointer" style-hover="background:#e08a4e">{{ networkActionLabel }}</button>
+          <button onClick="{{ closeModal }}" style="width:100%; margin-top:10px; background:none; border:0; color:rgba(245,234,216,0.55); font-size:13.5px; font-weight:700; cursor:pointer; padding:8px">Not now</button>
+        </div>
+      </sc-if>
+
+      <!-- share -->
+      <sc-if value="{{ modalShare }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <h3 style="font-size:24px">Share bounty</h3>
+          <div style="background:#141110; border:1px solid rgba(245,234,216,0.14); border-radius:16px; padding:14px 16px; margin-top:16px; font-size:13.5px; color:#f6a06b; word-break:break-all">{{ shareUrl }}</div>
+          <p style="margin-top:14px; font-size:14.5px; color:rgba(245,234,216,0.7); background:#141110; border:1px solid rgba(245,234,216,0.1); border-radius:16px; padding:14px 16px">{{ shareText }}</p>
+          <div style="display:flex; gap:8px; margin-top:16px; flex-wrap:wrap">
+            <sc-for list="{{ shareTargets }}" as="t" hint-placeholder-count="4">
+              <button onClick="{{ t.act }}" style="flex:1; min-width:70px; background:transparent; border:1px solid rgba(245,234,216,0.16); color:#f5ead8; border-radius:999px; padding:11px; font-size:13px; font-weight:700; cursor:pointer" style-hover="border-color:#f6a06b; color:#f6a06b">{{ t.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- toast -->
+  <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; left:50%; bottom:26px; transform:translateX(-50%); z-index:70; background:#241c18; border:1px solid rgba(246,160,107,0.4); color:#f5ead8; border-radius:999px; padding:12px 22px; font-size:14px; font-weight:600; animation:cbPop 200ms ease both; box-shadow:0 12px 32px rgba(0,0,0,0.5)">{{ toast }}</div>
+  </sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+const ORANGE = '#f6a06b', SAGE = '#aebf92', AMBER = '#e2b04a', RED = '#d4735e', MUTED = 'rgba(245,234,216,0.5)';
+const CATS = ['All', 'Development', 'Design', 'Content', 'Community', 'Research', 'Memes'];
+const SORTS = ['Newest', 'Highest Reward', 'Ending Soon', 'Most Submissions'];
+
+const STATUS = {
+  ACTIVE: { label: 'Active', color: SAGE, bg: 'rgba(174,191,146,0.14)' },
+  REVIEWING: { label: 'Reviewing', color: AMBER, bg: 'rgba(226,176,74,0.14)' },
+  COMPLETED: { label: 'Completed', color: SAGE, bg: 'rgba(174,191,146,0.14)' },
+  PAID: { label: 'Paid', color: ORANGE, bg: 'rgba(246,160,107,0.14)' },
+  EXPIRED: { label: 'Expired', color: MUTED, bg: 'rgba(245,234,216,0.08)' },
+  CANCELLED: { label: 'Cancelled', color: RED, bg: 'rgba(212,115,94,0.14)' }
+};
+
+const BOUNTIES = [
+  { id: 'mem-01', category: 'Memes', title: 'Create a Cookie Chain meme', reward: 2, hours: 38, subs: 12, creator: '7xQ…92A', status: 'REVIEWING', sort: 2,
+    description: 'Create a high-quality meme promoting Cookie Chain that can be posted on X. It should be funny without being cringe, and readable at phone size.',
+    requirements: ['Original artwork or edit — no reposts', 'Square or 16:9, at least 1200px wide', 'No token price talk or financial claims'],
+    submitInstructions: 'Post the meme as an unlisted link (X draft, Imgur, Drive) and paste the URL. Attach the source file if you have one.',
+    txSig: '4kD9…qW2m7Rb1sT…Zc8', submissions: [
+      { contributor: '7xQ…91A', when: '2 hours ago', status: 'Pending', num: '#1', note: 'I created three meme variations around the "your reward is already there" line — flat cookie mascot, 1200×1200, plus an animated version.', url: 'https://cdn.example.com/cookie-memes-v3.zip' },
+      { contributor: '3Vb…44K', when: '5 hours ago', status: 'Pending', num: '#2', note: 'One clean meme in the Cookie palette, sized for X timeline. Source PSD included.', url: 'https://cdn.example.com/cookie-meme-psd' },
+      { contributor: '9Lk…77D', when: 'Yesterday', status: 'Rejected', num: '#3', note: 'Quick edit of an existing template.', url: 'https://cdn.example.com/meme-template-edit' }
+    ] },
+  { id: 'dev-02', category: 'Development', title: 'Build a Cookie analytics widget', reward: 10, hours: 74, subs: 3, creator: '8Fh…29B', status: 'ACTIVE', sort: 1,
+    description: 'An embeddable widget showing live Cookie Chain stats — block time, active bounties, COOK in escrow. Vanilla JS, no framework dependency.',
+    requirements: ['Single script tag embed, under 20kb', 'Reads from the public RPC at rpc.cookiescan.io', 'Dark and light variants'],
+    submitInstructions: 'Link a public repo and a live demo page. Include a one-line embed snippet in the README.',
+    txSig: '9mF2…kT7nX4pQ0aL…Rv3', submissions: [
+      { contributor: '2Wc…31E', when: '6 hours ago', status: 'Pending', num: '#1', note: 'Widget is live on my demo page — 14kb gzipped, polls the RPC every 8s with a websocket fallback.', url: 'https://demo.example.com/cookie-widget' },
+      { contributor: '5Tn…08F', when: 'Yesterday', status: 'Pending', num: '#2', note: 'Repo with both themes and a storybook.', url: 'https://github.example.com/cookie-widget' }
+    ] },
+  { id: 'con-03', category: 'Content', title: 'Write a Cookie Chain explainer thread', reward: 4, hours: 22, subs: 7, creator: '4Qm…10C', status: 'REVIEWING', sort: 3,
+    description: 'A 10-post thread explaining what an SVM-compatible chain is, for people who have used a wallet but never read a spec.',
+    requirements: ['Plain language, no jargon without a definition', 'No performance numbers we have not measured', 'One diagram or image'],
+    submitInstructions: 'Paste a link to the draft thread. Do not publish before approval.',
+    txSig: '1Ba7…zY6rM3vK9dH…Jw5', submissions: [
+      { contributor: '7xQ…91A', when: '1 hour ago', status: 'Pending', num: '#1', note: 'Ten posts, one hand-drawn diagram of escrow, no price talk anywhere.', url: 'https://draft.example.com/svm-thread' }
+    ] },
+  { id: 'des-04', category: 'Design', title: 'Design bounty card illustrations', reward: 6, hours: 96, subs: 1, creator: '9Lk…77D', status: 'ACTIVE', sort: 4,
+    description: 'Six small warm illustrations, one per bounty category, that sit on a dark surface without glowing.',
+    requirements: ['SVG, single accent colour plus cream', 'Legible at 48px', 'No gradients'],
+    submitInstructions: 'Share a Figma link with view access, or a zip of SVGs.',
+    txSig: '6Hn3…tR8wC2yF5eP…Ls9', submissions: [] },
+  { id: 'com-05', category: 'Community', title: 'Host a Cookie community call', reward: 3, hours: 140, subs: 0, creator: '2Wc…31E', status: 'ACTIVE', sort: 5,
+    description: 'Run a 30-minute community call for builders shipping on Cookie Chain. Agenda, hosting, and a short written recap afterwards.',
+    requirements: ['At least 15 attendees', 'Recording published', 'Written recap under 400 words'],
+    submitInstructions: 'Submit the recording link and the recap.',
+    txSig: '8Jd5…pM1qV7nB4xR…Gt2', submissions: [] },
+  { id: 'res-06', category: 'Research', title: 'Benchmark SVM fee behaviour under load', reward: 8, hours: 12, subs: 5, creator: '5Tn…08F', status: 'ACTIVE', sort: 6,
+    description: 'Measure real transaction cost and confirmation behaviour for small transfers, and publish the method so anyone can rerun it.',
+    requirements: ['Reproducible script', 'Raw data published', 'No claims beyond what you measured'],
+    submitInstructions: 'Link the repo with the script and the raw results.',
+    txSig: '0Pq8…hF4jN9cZ6mW…Dk1', submissions: [
+      { contributor: '3Vb…44K', when: '3 hours ago', status: 'Pending', num: '#1', note: '500 transfers over 4 hours, script and CSVs in the repo.', url: 'https://github.example.com/svm-fee-bench' }
+    ] }
+];
+
+const FUND_STEPS = ['Preparing transaction', 'Waiting for Nightly', 'Broadcasting', 'Cookie Chain confirming', 'Bounty funded'];
+const PAY_STEPS = ['Preparing transaction', 'Waiting for Nightly', 'Releasing escrow', 'Cookie Chain confirming', 'Payment complete'];
+
+const fmt = n => (Math.round(n * 100) / 100).toString().replace(/\.00$/, '');
+
+class Component extends DCLogic {
+  state = {
+    screen: 'home', modal: null, connected: false, hasNightly: false, wrongNetwork: false,
+    address: '7xQvL2mPd8ZnK4tR1yB6cHf3sWjA92A', balance: 127.42,
+    bountyId: 'mem-01', reviewSubIndex: 0, copied: false, toast: null,
+    filter: 'All', sort: 'Newest', step: 1, width: 1200,
+    form: { title: '', description: '', reward: '5', deadline: '48 hours', category: 'Design' },
+    submission: { url: '', note: '' },
+    txKind: null, txIndex: 0
+  };
+
+  componentDidMount() {
+    this.onResize = () => this.setState({ width: window.innerWidth });
+    window.addEventListener('resize', this.onResize);
+    this.onResize();
+    const p = window.nightly && (window.nightly.solana || window.nightly);
+    this.setState({ hasNightly: !!p });
+  }
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.onResize);
+    clearTimeout(this.txTimer); clearTimeout(this.toastTimer);
+  }
+
+  flash(msg) {
+    clearTimeout(this.toastTimer);
+    this.setState({ toast: msg });
+    this.toastTimer = setTimeout(() => this.setState({ toast: null }), 2200);
+  }
+  go = s => this.setState({ screen: s, modal: null });
+
+  connect = async () => {
+    const p = window.nightly && (window.nightly.solana || window.nightly);
+    if (!p) { this.setState({ modal: 'network', networkMode: 'missing' }); return; }
+    try {
+      const res = await p.connect();
+      const addr = (res && res.publicKey ? res.publicKey.toString() : null) || this.state.address;
+      this.setState({ connected: true, address: addr });
+      this.flash('Nightly connected');
+    } catch (e) {
+      this.flash('Connection cancelled in Nightly');
+    }
+  };
+  fakeConnect = () => { this.setState({ connected: true, modal: null }); this.flash('Connected (demo wallet)'); };
+  disconnect = () => { this.setState({ connected: false, modal: null }); this.flash('Wallet disconnected'); };
+
+  runTx(kind, onDone) {
+    const steps = kind === 'pay' ? PAY_STEPS : FUND_STEPS;
+    this.setState({ modal: 'tx', txKind: kind, txIndex: 0 });
+    const tick = i => {
+      this.txTimer = setTimeout(() => {
+        this.setState({ txIndex: i });
+        if (i < steps.length - 1) tick(i + 1); else if (onDone) onDone();
+      }, i === 0 ? 260 : [0, 500, 900, 620, 520][i] || 500);
+    };
+    tick(1);
+  }
+
+  bounty() { return BOUNTIES.find(b => b.id === this.state.bountyId) || BOUNTIES[0]; }
+  rewardNum() { return parseFloat(this.state.form.reward) || 0; }
+
+  renderVals() {
+    const s = this.state, narrow = s.width < 1080, wide = !narrow;
+    const b = this.bounty();
+    const st = STATUS[b.status];
+    const chipOn = (on, c) => ({ bg: on ? 'rgba(246,160,107,0.16)' : 'rgba(245,234,216,0.05)', border: on ? 'rgba(246,160,107,0.6)' : 'rgba(245,234,216,0.14)', color: on ? ORANGE : 'rgba(245,234,216,0.75)' });
+    const endsLabel = h => h >= 24 ? `Ends in ${Math.floor(h / 24)}d ${h % 24}h` : `Ends in ${h}h`;
+
+    const card = x => ({
+      id: x.id, category: x.category, title: x.title, reward: fmt(x.reward) + ' COOK',
+      ends: endsLabel(x.hours), subs: x.subs === 1 ? '1 submission' : x.subs + ' submissions',
+      creator: x.creator, status: STATUS[x.status].label, statusColor: STATUS[x.status].color,
+      open: () => this.setState({ screen: 'detail', bountyId: x.id, modal: null })
+    });
+
+    let list = BOUNTIES.filter(x => s.filter === 'All' || x.category === s.filter);
+    if (s.sort === 'Highest Reward') list = [...list].sort((a, c) => c.reward - a.reward);
+    if (s.sort === 'Ending Soon') list = [...list].sort((a, c) => a.hours - c.hours);
+    if (s.sort === 'Most Submissions') list = [...list].sort((a, c) => c.subs - a.subs);
+    if (s.sort === 'Newest') list = [...list].sort((a, c) => a.sort - c.sort);
+
+    const txSteps = (s.txKind === 'pay' ? PAY_STEPS : FUND_STEPS).map((label, i) => {
+      const done = i < s.txIndex, active = i === s.txIndex;
+      return {
+        label, mark: done ? '✓' : (active ? '' : ''),
+        ring: done ? SAGE : (active ? ORANGE : 'rgba(245,234,216,0.2)'),
+        fill: done ? SAGE : (active ? 'rgba(246,160,107,0.35)' : 'transparent'),
+        color: done ? 'rgba(245,234,216,0.75)' : (active ? '#f5ead8' : 'rgba(245,234,216,0.38)'),
+        weight: active ? 700 : 500
+      };
+    });
+    const txFinished = s.txIndex >= txSteps.length - 1;
+    const payTarget = (b.submissions[s.reviewSubIndex] || b.submissions[0] || { contributor: '7xQ…91A' }).contributor;
+
+    const amt = this.rewardNum();
+    const navDefs = [['Bounties', 'bounties'], ['Activity', 'activity'], ['Leaderboard', 'leaderboard'], ['My Work', 'my-work'], ['My Bounties', 'my-bounties'], ['Docs', 'docs']];
+
+    return {
+      narrow, wide, shellPadBottom: narrow ? '88px' : '0px',
+      heroCols: narrow ? '1fr' : 'minmax(0,1.15fr) minmax(0,0.85fr)',
+      trustCols: narrow ? '1fr' : 'minmax(0,1.3fr) minmax(0,0.7fr)',
+      detailCols: narrow ? '1fr' : 'minmax(0,65fr) minmax(0,35fr)',
+      railPosition: narrow ? 'static' : 'sticky',
+      heroSize: narrow ? '44px' : '62px',
+      detailTitleSize: narrow ? '30px' : '40px',
+      modalWidth: s.modal === 'wallet' || s.modal === 'submit' ? '480px' : '440px',
+
+      isHome: s.screen === 'home', isBounties: s.screen === 'bounties', isDetail: s.screen === 'detail',
+      isCreate: s.screen === 'create', isMyBounties: s.screen === 'my-bounties', isReview: s.screen === 'review',
+      isMyWork: s.screen === 'my-work', isActivity: s.screen === 'activity', isLeaderboard: s.screen === 'leaderboard',
+      isDocs: s.screen === 'docs',
+
+      connected: s.connected, disconnected: !s.connected,
+      shortAddress: s.address.slice(0, 3) + '…' + s.address.slice(-3),
+      fullAddress: s.address, balanceLabel: fmt(s.balance) + ' COOK',
+      copyLabel: s.copied ? 'Copied' : 'Copy',
+      networkColor: s.wrongNetwork ? AMBER : SAGE,
+      networkLabel: s.wrongNetwork ? 'Wrong network — switch to Cookie Chain' : 'Connected to Cookie Chain',
+
+      navItems: navDefs.map(([label, key]) => ({
+        label, go: () => this.go(key),
+        bg: s.screen === key ? 'rgba(246,160,107,0.16)' : 'transparent',
+        color: s.screen === key ? ORANGE : 'rgba(245,234,216,0.7)'
+      })),
+      mobileTabs: [['Home', 'home'], ['Bounties', 'bounties'], ['Activity', 'activity'], ['My Work', 'my-work']].map(([label, key]) => ({
+        label, go: () => this.go(key),
+        color: s.screen === key ? ORANGE : 'rgba(245,234,216,0.55)',
+        dot: s.screen === key ? ORANGE : 'rgba(245,234,216,0.3)'
+      })),
+
+      goHome: () => this.go('home'), goBounties: () => this.go('bounties'), goCreate: () => this.go('create'),
+      goActivity: () => this.go('activity'), goDocs: () => this.go('docs'), goMyBounties: () => this.go('my-bounties'),
+      openWallet: () => this.setState({ modal: s.connected ? 'wallet' : null, copied: false }),
+      openGetCook: () => this.flash('Opens the Hyperlane Cookie Chain bridge'),
+      viewOnScan: () => this.flash('Opens cookiescan.io with the real signature'),
+      stopProp: e => e.stopPropagation(),
+      closeModal: () => this.setState({ modal: null }),
+
+      globalStats: [
+        { value: '42', label: 'Active bounties' }, { value: '381', label: 'COOK in escrow' },
+        { value: '128', label: 'Completed' }, { value: '742', label: 'COOK paid' }
+      ],
+      flowNodes: [
+        { title: 'Creator funds', sub: 'Deposit into escrow PDA', amount: '5 COOK', dot: ORANGE, bg: 'rgba(246,160,107,0.08)', border: 'rgba(246,160,107,0.28)' },
+        { title: 'Bounty funded', sub: 'Status becomes active', amount: 'Locked', dot: ORANGE, bg: '#141110', border: 'rgba(245,234,216,0.12)' },
+        { title: 'Builder submits', sub: 'Reference stored on-chain', amount: '', dot: 'rgba(245,234,216,0.5)', bg: '#141110', border: 'rgba(245,234,216,0.12)' },
+        { title: 'Creator approves', sub: 'Only the creator can', amount: '✓', dot: SAGE, bg: '#141110', border: 'rgba(245,234,216,0.12)' },
+        { title: 'Contributor paid', sub: 'Escrow released', amount: '5 COOK', dot: SAGE, bg: 'rgba(174,191,146,0.08)', border: 'rgba(174,191,146,0.3)' }
+      ],
+      heroActivity: [
+        { kind: 'Bounty completed', color: SAGE, title: 'Create a Cookie Chain meme', amount: '2 COOK', meta: '→ 7xQ…92A' },
+        { kind: 'New bounty', color: ORANGE, title: 'Build a Cookie analytics widget', amount: '10 COOK', meta: 'funded' },
+        { kind: 'Reward paid', color: ORANGE, title: 'Write a Cookie Chain explainer', amount: '5 COOK', meta: '→ 8Fh…29B' }
+      ],
+      howCards: [
+        { num: '01', title: 'Post', body: 'Create a task and choose your reward.' },
+        { num: '02', title: 'Build', body: 'Community members complete the task.' },
+        { num: '03', title: 'Earn', body: 'Approve the work and pay the contributor on-chain.' }
+      ],
+      whyCards: [
+        { title: 'Fast', body: 'Rapid transaction confirmation, so approving work feels immediate.' },
+        { title: 'Cheap', body: 'Low-cost execution makes small community rewards practical.' },
+        { title: 'On-chain', body: 'Every funding and payout is verifiable on CookieScan.' }
+      ],
+      featuredBounties: list.slice(0, 3).map(card),
+      filteredBounties: list.map(card),
+      noResults: list.length === 0,
+      resultCount: list.length + (list.length === 1 ? ' bounty' : ' bounties'),
+      categories: CATS.map(c => ({ label: c, select: () => this.setState({ filter: c }), ...chipOn(s.filter === c) })),
+      sorts: SORTS.map(x => ({
+        label: x, select: () => this.setState({ sort: x }),
+        color: s.sort === x ? ORANGE : 'rgba(245,234,216,0.6)',
+        underline: s.sort === x ? ORANGE : 'transparent'
+      })),
+
+      current: {
+        title: b.title, category: b.category, description: b.description, reward: fmt(b.reward) + ' COOK',
+        endsIn: b.hours >= 24 ? Math.floor(b.hours / 24) + 'd ' + (b.hours % 24) + 'h' : b.hours + 'h',
+        creator: b.creator, txSig: b.txSig, status: st.label, statusColor: st.color, statusBg: st.bg,
+        subs: b.subs === 1 ? '1 submission' : b.subs + ' submissions',
+        submitInstructions: b.submitInstructions,
+        requirements: b.requirements.map(t => ({ text: t })),
+        noSubmissions: b.submissions.length === 0,
+        submissions: b.submissions.map((x, i) => ({
+          contributor: x.contributor, when: x.when, status: x.status,
+          color: x.status === 'Rejected' ? RED : AMBER,
+          avatar: ['#c67139', '#7a8a5e', '#8c491a'][i % 3]
+        }))
+      },
+      shareTargets: ['Copy link', 'X', 'Telegram', 'Discord'].map(l => ({
+        label: l, act: () => this.flash(l === 'Copy link' ? 'Link copied' : 'Opens a ' + l + ' share')
+      })),
+      openSubmit: () => this.setState({ modal: s.connected ? 'submit' : 'network', networkMode: s.connected ? null : 'missing' }),
+
+      // create flow
+      form: s.form, step1: s.step === 1, step2: s.step === 2, step3: s.step === 3, step4: s.step === 4, step5: s.step === 5,
+      stepLabel: 'Step ' + s.step + ' of 5',
+      stepPips: [1, 2, 3, 4, 5].map(i => ({ bg: i <= s.step ? ORANGE : 'rgba(245,234,216,0.14)' })),
+      setTitle: e => this.setState({ form: { ...s.form, title: e.target.value } }),
+      setDescription: e => this.setState({ form: { ...s.form, description: e.target.value } }),
+      setReward: e => this.setState({ form: { ...s.form, reward: e.target.value.replace(/[^0-9.]/g, '') } }),
+      rewardPresets: ['1', '2', '5', '10'].map(v => ({ label: v + ' COOK', select: () => this.setState({ form: { ...s.form, reward: v } }) })),
+      afterFunding: fmt(Math.max(0, s.balance - amt)) + ' COOK',
+      insufficient: amt > s.balance,
+      deadlines: ['24 hours', '48 hours', '7 days', 'Custom'].map(d => ({
+        label: d, sub: d === '48 hours' ? 'Recommended' : (d === 'Custom' ? 'Pick a date and time' : 'Refundable after expiry'),
+        select: () => this.setState({ form: { ...s.form, deadline: d } }),
+        bg: s.form.deadline === d ? 'rgba(246,160,107,0.12)' : '#1a1615',
+        border: s.form.deadline === d ? 'rgba(246,160,107,0.6)' : 'rgba(245,234,216,0.12)',
+        color: s.form.deadline === d ? ORANGE : '#f5ead8'
+      })),
+      createCategories: CATS.slice(1).concat(['Other']).map(c => ({
+        label: c, select: () => this.setState({ form: { ...s.form, category: c } }), ...chipOn(s.form.category === c)
+      })),
+      reviewTitle: s.form.title || 'Create a Cookie Chain meme',
+      reviewDescription: s.form.description || 'Create a high-quality meme promoting Cookie Chain that can be posted on X.',
+      reviewRows: [
+        { label: 'Reward', value: fmt(amt) + ' COOK', color: ORANGE },
+        { label: 'Deadline', value: s.form.deadline, color: '#f5ead8' },
+        { label: 'Category', value: s.form.category, color: '#f5ead8' },
+        { label: 'Funding', value: fmt(amt) + ' COOK', color: ORANGE }
+      ],
+      escrowNotice: fmt(amt) + ' COOK will be locked in this bounty until it is completed, cancelled, or refunded after the deadline.',
+      canGoBack: s.step > 1,
+      nextLabel: s.step === 5 ? 'Fund & Publish' : 'Continue',
+      prevStep: () => this.setState({ step: Math.max(1, s.step - 1) }),
+      nextStep: () => {
+        if (s.step < 5) { this.setState({ step: s.step + 1 }); return; }
+        if (!s.connected) { this.setState({ modal: 'network', networkMode: 'missing' }); return; }
+        if (amt > s.balance) { this.flash("Your wallet doesn't have enough COOK"); return; }
+        this.setState({ modal: 'fund' });
+      },
+
+      // fund modal
+      modalFund: s.modal === 'fund', modalApprove: s.modal === 'approve', modalTx: s.modal === 'tx',
+      modalSuccess: s.modal === 'success', modalSubmit: s.modal === 'submit', modalSubmitted: s.modal === 'submitted',
+      modalCompleted: s.modal === 'completed', modalWallet: s.modal === 'wallet', modalNetwork: s.modal === 'network',
+      modalShare: s.modal === 'share', hasModal: !!s.modal,
+      fundAmountLabel: fmt(amt) + ' COOK',
+      fundRows: [
+        { label: 'Into', value: 'Cookie Bounties escrow', color: '#f5ead8' },
+        { label: 'Your wallet', value: fmt(s.balance) + ' COOK', color: '#f5ead8' },
+        { label: 'After funding', value: fmt(Math.max(0, s.balance - amt)) + ' COOK', color: '#f5ead8' },
+        { label: 'Network fee', value: 'estimated at signing', color: 'rgba(245,234,216,0.6)' }
+      ],
+      confirmFund: () => this.runTx('fund', () => this.setState({ balance: Math.max(0, s.balance - amt) })),
+      txTitle: s.txKind === 'pay' ? 'Approving submission' : 'Funding bounty',
+      txSteps, txDone: txFinished,
+      txResultTitle: s.txKind === 'pay' ? 'Payment complete' : 'Bounty funded',
+      txResultDetail: s.txKind === 'pay'
+        ? fmt(b.reward) + ' COOK → ' + payTarget
+        : fmt(amt) + ' COOK secured in escrow',
+      txContinueLabel: s.txKind === 'pay' ? 'See the payout' : 'Continue',
+      txContinue: () => this.setState({ modal: s.txKind === 'pay' ? 'completed' : 'success' }),
+
+      approveTarget: payTarget,
+      confirmApprove: () => this.runTx('pay'),
+
+      viewCreated: () => this.setState({ screen: 'detail', bountyId: 'mem-01', modal: null }),
+      shareBounty: () => this.setState({ modal: 'share' }),
+      shareUrl: 'cookiebounties.xyz/bounties/' + b.id,
+      shareText: 'Just posted a ' + fmt(b.reward) + ' COOK bounty on Cookie Chain. Looking for someone to ' + b.title.toLowerCase() + '. Complete the task → get paid on-chain.',
+
+      submission: s.submission,
+      setSubUrl: e => this.setState({ submission: { ...s.submission, url: e.target.value } }),
+      setSubNote: e => this.setState({ submission: { ...s.submission, note: e.target.value } }),
+      confirmSubmit: () => {
+        if (!s.submission.url) { this.flash('Add a link to your work first'); return; }
+        this.setState({ modal: 'submitted' });
+      },
+      goMyWorkClose: () => this.go('my-work'),
+      goActivityClose: () => this.go('activity'),
+      goCreateClose: () => this.setState({ screen: 'create', step: 1, modal: null }),
+
+      payoutTrail: [
+        { label: 'From', value: 'Bounty escrow', color: '#f5ead8', border: 'rgba(245,234,216,0.12)' },
+        { label: 'Paid to', value: payTarget, color: SAGE, border: 'rgba(174,191,146,0.35)' },
+        { label: 'Status', value: 'PAID', color: ORANGE, border: 'rgba(246,160,107,0.35)' }
+      ],
+
+      copyAddress: () => {
+        if (navigator.clipboard) navigator.clipboard.writeText(s.address);
+        this.setState({ copied: true });
+        setTimeout(() => this.setState({ copied: false }), 1600);
+      },
+      disconnect: this.disconnect, connect: this.connect,
+      walletStats: [
+        { value: '18', label: 'Completed', color: '#f5ead8' },
+        { value: '42 COOK', label: 'Earned', color: SAGE },
+        { value: '96 COOK', label: 'Funded', color: ORANGE }
+      ],
+      networkModalTitle: s.networkMode === 'missing' ? 'Nightly not detected' : 'Wrong network',
+      networkModalBody: s.networkMode === 'missing'
+        ? 'Cookie Bounties needs the Nightly wallet. Install it, or continue with a demo wallet to walk through the flow.'
+        : 'Switch your wallet to Cookie Chain before continuing. If automatic switching is not supported, open Nightly and select Cookie Chain.',
+      networkActionLabel: s.networkMode === 'missing' ? 'Continue with demo wallet' : 'Switch network',
+      networkAction: s.networkMode === 'missing' ? this.fakeConnect : () => { this.setState({ wrongNetwork: false, modal: null }); this.flash('Switched to Cookie Chain'); },
+
+      creatorStats: [
+        { value: '4', label: 'Active', color: '#f5ead8' }, { value: '23', label: 'Submissions', color: '#f5ead8' },
+        { value: '12', label: 'Completed', color: SAGE }, { value: '96', label: 'COOK funded', color: ORANGE },
+        { value: '84', label: 'COOK paid', color: ORANGE }
+      ],
+      myBounties: BOUNTIES.slice(0, 4).map(x => {
+        const needsReview = x.status === 'REVIEWING';
+        return {
+          title: x.title, category: x.category, reward: fmt(x.reward) + ' COOK',
+          subs: x.subs === 1 ? '1 submission' : x.subs + ' submissions',
+          ends: endsLabel(x.hours).replace('Ends in ', ''),
+          status: STATUS[x.status].label, statusColor: STATUS[x.status].color,
+          action: needsReview ? 'Review' : 'Open',
+          actionBg: needsReview ? '#c67139' : 'transparent',
+          actionColor: needsReview ? '#141110' : '#f5ead8',
+          actionBorder: needsReview ? '#c67139' : 'rgba(245,234,216,0.2)',
+          review: () => this.setState({ screen: 'review', bountyId: x.id, reviewSubIndex: 0 })
+        };
+      }),
+      reviewSubmissions: b.submissions.map((x, i) => ({
+        num: x.num, contributor: x.contributor, when: x.when, note: x.note, url: x.url,
+        status: x.status, color: x.status === 'Rejected' ? RED : AMBER,
+        cardBorder: x.status === 'Rejected' ? 'rgba(245,234,216,0.07)' : 'rgba(245,234,216,0.12)',
+        avatar: ['#c67139', '#7a8a5e', '#8c491a'][i % 3],
+        openWork: () => this.flash('Opens ' + x.url),
+        reject: () => this.flash('Submission ' + x.num + ' rejected — escrow unchanged'),
+        approve: () => this.setState({ modal: 'approve', reviewSubIndex: i })
+      })),
+
+      workStats: [
+        { value: '17', label: 'Submitted', color: '#f5ead8' }, { value: '3', label: 'In review', color: AMBER },
+        { value: '14', label: 'Completed', color: SAGE }, { value: '42.5', label: 'COOK earned', color: ORANGE }
+      ],
+      myWork: [
+        { title: 'Create a Cookie Chain meme', reward: '2 COOK', status: 'In review', color: AMBER, when: 'Submitted 3h ago', creator: '7xQ…92A' },
+        { title: 'Write a Cookie Chain explainer thread', reward: '4 COOK', status: 'In review', color: AMBER, when: 'Submitted 1h ago', creator: '4Qm…10C' },
+        { title: 'Cookie Chain wallet onboarding video', reward: '6 COOK', status: 'Paid', color: ORANGE, when: 'Paid 2d ago', creator: '8Fh…29B' },
+        { title: 'Translate the docs into Spanish', reward: '5 COOK', status: 'Paid', color: ORANGE, when: 'Paid 6d ago', creator: '2Wc…31E' }
+      ].map(w => ({ ...w, view: () => this.setState({ screen: 'detail', bountyId: 'mem-01' }) })),
+
+      activityFeed: [
+        { kind: 'Bounty completed', color: SAGE, tint: 'rgba(174,191,146,0.16)', title: 'Create a Cookie Chain meme', detail: '2 COOK paid to 7xQ…91A', amount: '2 COOK', ago: '8s ago' },
+        { kind: 'Bounty funded', color: ORANGE, tint: 'rgba(246,160,107,0.16)', title: 'Build a Cookie analytics widget', detail: 'Escrow funded by 8Fh…29B', amount: '10 COOK', ago: '2m ago' },
+        { kind: 'New contribution', color: '#f5ead8', tint: 'rgba(245,234,216,0.1)', title: 'Write a Cookie Chain explainer thread', detail: '3Vb…44K submitted work', amount: '4 COOK', ago: '5m ago' },
+        { kind: 'Bounty funded', color: ORANGE, tint: 'rgba(246,160,107,0.16)', title: 'Design bounty card illustrations', detail: 'Escrow funded by 9Lk…77D', amount: '6 COOK', ago: '18m ago' },
+        { kind: 'Reward paid', color: SAGE, tint: 'rgba(174,191,146,0.16)', title: 'Benchmark SVM fee behaviour', detail: '8 COOK paid to 5Tn…08F', amount: '8 COOK', ago: '41m ago' },
+        { kind: 'Refunded', color: MUTED, tint: 'rgba(245,234,216,0.08)', title: 'Cookie sticker pack', detail: 'Deadline passed — 3 COOK returned to creator', amount: '3 COOK', ago: '1h ago' }
+      ],
+
+      leaderboard: [
+        ['01', '7xQ…92A', 18, 42], ['02', '3Vb…44K', 14, 38], ['03', '8Fh…29B', 11, 31],
+        ['04', '5Tn…08F', 9, 24], ['05', '2Wc…31E', 7, 19], ['06', '9Lk…77D', 5, 12]
+      ].map(([rank, address, completed, earned], i) => ({
+        rank, address, completed: completed + ' completed', earned: earned + ' COOK',
+        rankColor: i < 3 ? ORANGE : 'rgba(245,234,216,0.4)',
+        avatar: ['#c67139', '#7a8a5e', '#8c491a', '#645c50', '#b2622d', '#56633f'][i]
+      })),
+
+      escrowDiagram: [
+        { title: 'Creator', sub: 'Signs create + fund', amount: '5 COOK', color: ORANGE, bg: 'rgba(246,160,107,0.08)', border: 'rgba(246,160,107,0.3)' },
+        { title: 'Bounty escrow', sub: 'Program-derived account', amount: 'Locked', color: '#f5ead8', bg: '#141110', border: 'rgba(245,234,216,0.14)' },
+        { title: 'Contributor', sub: 'On approval only', amount: '5 COOK', color: SAGE, bg: 'rgba(174,191,146,0.08)', border: 'rgba(174,191,146,0.3)' }
+      ],
+      docSections: [
+        { title: 'What is Cookie Bounties?', body: 'A community bounty board where people post tasks, lock COOK as the reward, and contributors get paid automatically when their work is approved.' },
+        { title: 'How to create a bounty', body: 'Write the task, set the reward, pick a deadline and category, then sign one transaction that creates the bounty and funds the escrow together.' },
+        { title: 'How to submit work', body: 'Open an active bounty before its deadline, add a link to your work and a short note. Only the reference is stored on-chain.' },
+        { title: 'How payment works', body: 'Only the bounty creator can approve. Approval releases the escrow to the winning contributor in the same transaction — the reward cannot be paid twice.' },
+        { title: 'Why Cookie Chain', body: 'SVM-compatible infrastructure with fast confirmation and low fees, which is what makes 2 COOK bounties practical at all.' },
+        { title: 'How to get COOK', body: 'Bridge COOK to Cookie Chain through the Hyperlane route. COOK uses 9 decimals and also pays network fees.' }
+      ],
+      lifecycle: ['Draft', 'Funded', 'Active', 'Submissions', 'Approved', 'Paid', 'Expired → Refunded', 'Cancelled → Refunded'].map((l, i) => ({
+        label: l,
+        color: i < 6 ? (i === 5 ? ORANGE : '#f5ead8') : 'rgba(245,234,216,0.55)',
+        border: i === 5 ? 'rgba(246,160,107,0.5)' : 'rgba(245,234,216,0.16)',
+        bg: i === 5 ? 'rgba(246,160,107,0.1)' : 'transparent'
+      })),
+
+      hasToast: !!s.toast, toast: s.toast
+    };
+  }
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,221 @@
+@import "tailwindcss";
+
+/*
+  Cookie Bounties — global base, keyframes and interaction classes.
+
+  The screens carry their exact look as inline styles ported from the source design compile
+  (design/Cookie Bounties.dc.html). React inline styles can't express :hover/:focus/:active or
+  keyframes, so those two things live here: the design's keyframes verbatim, and a small set of
+  interaction classes the screens attach alongside their inline styles.
+*/
+
+:root {
+  --cb-bg: #141110;
+  --cb-surface: #1a1615;
+  --cb-cream: #f5ead8;
+  --cb-brand: #c67139;
+  --cb-brand-hover: #e08a4e;
+  --cb-brand-active: #b2622d;
+  --cb-orange: #f6a06b;
+}
+
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+body {
+  background: var(--cb-bg);
+  color: var(--cb-cream);
+  font-family: "Figtree", system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+h1,
+h2,
+h3,
+h4,
+h5 {
+  font-family: "Caprasimo", system-ui, serif;
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  margin: 0;
+  line-height: 1.08;
+}
+p {
+  margin: 0;
+}
+a {
+  color: var(--cb-orange);
+  text-underline-offset: 3px;
+}
+a:hover {
+  color: #ffc6a5;
+}
+button {
+  font-family: inherit;
+}
+:focus-visible {
+  outline: 2px solid var(--cb-orange);
+  outline-offset: 2px;
+}
+::selection {
+  background: rgba(246, 160, 107, 0.3);
+}
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(245, 234, 216, 0.16);
+  border-radius: 99px;
+}
+
+/* ── Keyframes (verbatim from the source design) ── */
+@keyframes cbFlow {
+  0% {
+    transform: translateY(-6px);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(186px);
+    opacity: 0;
+  }
+}
+@keyframes cbPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+@keyframes cbIn {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes cbPop {
+  from {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@keyframes cbGlow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(246, 160, 107, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 12px rgba(246, 160, 107, 0);
+  }
+}
+@keyframes cbSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── Interaction classes (attached alongside inline styles) ── */
+.cb-primary {
+  transition: background 0.18s ease;
+}
+.cb-primary:hover {
+  background: var(--cb-brand-hover) !important;
+}
+.cb-primary:active {
+  background: var(--cb-brand-active) !important;
+}
+
+/* Sage "approve & pay" primary. */
+.cb-approve {
+  transition: background 0.18s ease;
+}
+.cb-approve:hover {
+  background: #c8d6ae !important;
+}
+
+/* Card that lifts and warms its border on hover. */
+.cb-lift {
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.cb-lift:hover {
+  transform: translateY(-3px);
+  border-color: rgba(246, 160, 107, 0.5) !important;
+}
+.cb-lift-4:hover {
+  transform: translateY(-4px);
+  border-color: rgba(246, 160, 107, 0.45) !important;
+}
+
+/* Outlined control that turns orange on hover. */
+.cb-outline {
+  transition: border-color 0.16s ease, color 0.16s ease;
+}
+.cb-outline:hover {
+  border-color: var(--cb-orange) !important;
+  color: var(--cb-orange) !important;
+}
+
+/* Soft fill on hover (secondary / ghost buttons). */
+.cb-soft {
+  transition: background 0.16s ease;
+}
+.cb-soft:hover {
+  background: rgba(245, 234, 216, 0.07) !important;
+}
+
+/* Nav pill hover. */
+.cb-navpill {
+  transition: background 0.16s ease;
+}
+.cb-navpill:hover {
+  background: rgba(245, 234, 216, 0.09) !important;
+}
+
+/* Warm-border-only hover (chips, share targets). */
+.cb-border-warm {
+  transition: border-color 0.16s ease, color 0.16s ease;
+}
+.cb-border-warm:hover {
+  border-color: rgba(246, 160, 107, 0.6) !important;
+}
+
+/* Row hover border. */
+.cb-row-warm {
+  transition: border-color 0.2s ease;
+}
+.cb-row-warm:hover {
+  border-color: rgba(246, 160, 107, 0.4) !important;
+}
+
+/* Danger-soft hover for reject / disconnect. */
+.cb-danger:hover {
+  background: rgba(212, 115, 94, 0.12) !important;
+}
+
+/* Inputs warm their border on focus. */
+.cb-input:focus {
+  border-color: var(--cb-orange) !important;
+  outline: none;
+}
