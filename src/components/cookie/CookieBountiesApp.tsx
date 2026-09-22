@@ -401,15 +401,6 @@ export function CookieBountiesApp({
     done: 4,
   };
 
-  /** Record a confirmed transaction + activity entry for the indexer/feed (best-effort). */
-  const recordEvent = (type: string, eventType: string, bountyPubkey?: string | null, signature?: string) => {
-    void fetch("/api/indexer/events", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ signature, type, eventType, bountyPubkey, wallet: s.address }),
-    }).catch(() => {});
-  };
-
   /** Run a real on-chain action, driving the transaction modal from its phases. */
   const runChainAction = async (
     kind: TxKind,
@@ -562,17 +553,8 @@ export function CookieBountiesApp({
         } catch {
           // Non-fatal — the transaction still confirmed.
         }
-        void fetch("/api/indexer/events", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({
-            signature: result.signature,
-            type: "FUND_BOUNTY",
-            eventType: "Bounty funded",
-            bountyPubkey: result.bounty,
-            wallet: s.address,
-          }),
-        }).catch(() => {});
+        // The board + activity feed are refreshed from on-chain state by the reconcile below.
+        void syncAndRefresh();
       } catch (e) {
         patch({ modal: null });
         flash(mapChainError(e));
@@ -599,7 +581,6 @@ export function CookieBountiesApp({
             new PublicKey(sub.contributorAddress!),
             onPhase,
           ),
-        (sig) => recordEvent("APPROVE_SUBMISSION", "Reward paid", b.pubkey, sig),
       );
       return;
     }
@@ -633,7 +614,6 @@ export function CookieBountiesApp({
       await runChainAction(
         "submit",
         (onPhase) => submitWork(wallet, new PublicKey(bountyPubkey), uri, onPhase).then((r) => r.signature),
-        (sig) => recordEvent("SUBMIT_WORK", "New contribution", bountyPubkey, sig),
       );
       return;
     }
@@ -648,7 +628,6 @@ export function CookieBountiesApp({
     await runChainAction(
       "cancel",
       (onPhase) => cancelBounty(wallet, new PublicKey(bountyPubkey), onPhase),
-      (sig) => recordEvent("CANCEL_BOUNTY", "Bounty cancelled", bountyPubkey, sig),
     );
   };
 
@@ -659,7 +638,6 @@ export function CookieBountiesApp({
     await runChainAction(
       "refund",
       (onPhase) => refundBounty(wallet, new PublicKey(bountyPubkey), onPhase),
-      (sig) => recordEvent("REFUND_BOUNTY", "Refunded", bountyPubkey, sig),
     );
   };
   const copyAddress = () => {

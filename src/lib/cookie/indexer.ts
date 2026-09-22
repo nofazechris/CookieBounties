@@ -3,7 +3,6 @@ import { getDb, isDbConfigured } from '@/lib/db';
 import {
   bounties as bountiesTable,
   submissions as submissionsTable,
-  transactions as transactionsTable,
   activity as activityTable,
 } from '@/lib/db/schema';
 import { getReadonlyProgram } from '@/lib/program/client';
@@ -133,42 +132,36 @@ export async function reconcileFromChain(): Promise<{ bounties: number; submissi
       });
   }
 
+  // Derive the activity feed purely from on-chain facts (idempotent via dedupeKey). There is no
+  // client-writable activity endpoint, so nothing can spoof the feed.
+  for (const { publicKey, account } of bountyAccounts) {
+    const pk = publicKey.toString();
+    const created = new Date(Number(account.createdAt?.toString?.() ?? 0) * 1000);
+    await putActivity(`fund:${pk}`, 'Bounty funded', pk, account.creator.toString(), created);
+    const st = statusLabel(account.status);
+    if (st === 'COMPLETED' || st === 'PAID') {
+      await putActivity(`paid:${pk}`, 'Reward paid', pk, account.creator.toString(), created);
+    }
+  }
+  for (const { publicKey, account } of submissionAccounts) {
+    const pk = publicKey.toString();
+    const when = new Date(Number(account.submittedAt?.toString?.() ?? 0) * 1000);
+    await putActivity(`submit:${pk}`, 'New contribution', account.bounty.toString(), account.contributor.toString(), when);
+  }
+
   return { bounties: bountyAccounts.length, submissions: submissionAccounts.length };
 }
 
-/** Record a confirmed transaction (idempotent on signature, §41). */
-export async function recordTransaction(input: {
-  signature: string;
-  type: string;
-  bountyPubkey?: string;
-  wallet?: string;
-}): Promise<void> {
-  if (!isDbConfigured()) return;
+/** Insert one activity-feed entry, once (unique dedupeKey). Only called with on-chain-derived data. */
+async function putActivity(
+  dedupeKey: string,
+  eventType: string,
+  bountyPubkey: string,
+  wallet: string,
+  createdAt: Date,
+): Promise<void> {
   await getDb()
-    .insert(transactionsTable)
-    .values({
-      signature: input.signature,
-      type: input.type,
-      bountyPubkey: input.bountyPubkey ?? null,
-      wallet: input.wallet ?? null,
-    })
-    .onConflictDoNothing({ target: transactionsTable.signature });
-}
-
-/** Append an activity-feed entry derived from an indexed event (§37). */
-export async function recordActivity(input: {
-  eventType: string;
-  bountyPubkey?: string;
-  wallet?: string;
-  transactionSignature?: string;
-  metadata?: Record<string, unknown>;
-}): Promise<void> {
-  if (!isDbConfigured()) return;
-  await getDb().insert(activityTable).values({
-    eventType: input.eventType,
-    bountyPubkey: input.bountyPubkey ?? null,
-    wallet: input.wallet ?? null,
-    transactionSignature: input.transactionSignature ?? null,
-    metadata: input.metadata ?? null,
-  });
+    .insert(activityTable)
+    .values({ dedupeKey, eventType, bountyPubkey, wallet, createdAt })
+    .onConflictDoNothing({ target: activityTable.dedupeKey });
 }

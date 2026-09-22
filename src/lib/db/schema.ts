@@ -86,6 +86,8 @@ export const activity = pgTable(
   'activity',
   {
     id: uuid('id').defaultRandom().primaryKey(),
+    /** Idempotency key so re-indexing the same on-chain fact doesn't duplicate the feed entry. */
+    dedupeKey: text('dedupe_key').unique(),
     eventType: text('event_type').notNull(),
     bountyPubkey: text('bounty_pubkey'),
     wallet: text('wallet'),

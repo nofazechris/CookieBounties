@@ -5,10 +5,17 @@ import { storeMetadata, metadataUri, type BountyMetadata, type SubmissionMetadat
  * POST /api/metadata — store off-chain bounty/submission content and return the URI to record
  * on-chain (§29–§31, §75). The client uploads here before building the create/submit transaction.
  */
+/** Reject oversized payloads so this open endpoint can't be used to dump large blobs into the DB. */
+const MAX_BYTES = 8 * 1024;
+
 export async function POST(req: Request) {
+  const raw = await req.text();
+  if (raw.length > MAX_BYTES) {
+    return NextResponse.json({ error: 'Payload too large.' }, { status: 413 });
+  }
   let body: unknown;
   try {
-    body = await req.json();
+    body = JSON.parse(raw);
   } catch {
     return NextResponse.json({ error: 'Invalid JSON body.' }, { status: 400 });
   }

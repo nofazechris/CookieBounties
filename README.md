@@ -37,14 +37,27 @@ in-repo seed in `src/lib/cookie/data.ts`.
 
 ### Using Postgres
 
-Set `DATABASE_URL` in `.env` (see `.env.example`), then:
+Create `.env.local` (never commit it — it's gitignored) with the values below, then run the
+migrations:
+
+```bash
+# Cookie Chain (public)
+NEXT_PUBLIC_COOKIE_RPC_URL=https://rpc.cookiescan.io
+NEXT_PUBLIC_COOKIE_EXPLORER_URL=https://cookiescan.io
+NEXT_PUBLIC_BOUNTIES_PROGRAM_ID=<your deployed program id>
+# Neon Postgres (server-only secret)
+DATABASE_URL=<your neon connection string>
+# Optional: require this on the Vercel Cron GET to /api/indexer/sync
+CRON_SECRET=<random string>
+```
 
 ```bash
 npm run db:push   # create the tables from the schema
-npm run db:seed   # load the fixture bounties + submissions
 ```
 
 `npm run db:generate` / `npm run db:migrate` produce and apply versioned SQL migrations instead.
+The board and activity feed populate from the on-chain indexer (`/api/indexer/sync`), so seeding is
+optional (`npm run db:seed` loads sample data for local UI work).
 
 ## Layout
 
