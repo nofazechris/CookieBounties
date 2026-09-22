@@ -22,7 +22,7 @@ deadline. The money is always where it should be: on-chain, and impossible to fa
 | **Explorer** | [CookieScan](https://cookiescan.io/address/5Pb9fVyi7t9b5wxDb6tJSNyZUbcuw1uqqacnCYUGq97j) |
 | **Deploy tx** | [`KGZNyy25…q1piJQQ`](https://cookiescan.io/tx/KGZNyy25MgYGDnR6HmkWeiP1XvEfZrpNkpGXpdBaUgLQkXGeQQFMyesP7c4UoknM9A3PycjgDrNKWGYKq1piJQQ) |
 | **Wallet** | Nightly |
-| **Live demo** | _coming soon (Vercel)_ |
+| **Live demo** | **[cookiebounties.vercel.app](https://cookiebounties.vercel.app)** |
 
 The Anchor program is **live and holding real COOK in escrow** — every create, fund, submit,
 approve and refund in the app is a real transaction on Cookie Chain.
