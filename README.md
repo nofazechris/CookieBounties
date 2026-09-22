@@ -68,6 +68,39 @@ Nightly ──sign──▶ Next.js ──▶ Anchor program ──▶ Escrow PD
 The **blockchain is the authority over money**; Neon is a fast, searchable mirror for the
 marketplace, activity and analytics — it is never trusted with balances, ownership or payouts.
 
+## On-chain program
+
+`program/` is the Anchor/Rust program that owns every escrow. Source of truth for all funds.
+
+### Instructions
+
+| Instruction | Signer | Effect |
+| --- | --- | --- |
+| `create_and_fund_bounty` | creator | Creates the bounty + escrow PDA and moves the reward into escrow in one tx → **Active** |
+| `submit_work` | contributor | Records a submission (only while Active and before the deadline) |
+| `approve_submission` | creator | Releases the escrow to the winning contributor → **Completed** |
+| `cancel_bounty` | creator | Before any approval — refunds the escrow to the creator → **Cancelled** |
+| `refund_bounty` | creator | After the deadline with no winner — refunds the escrow → **Expired** |
+
+### PDAs (accounts)
+
+| Account | Seeds |
+| --- | --- |
+| Bounty | `["bounty", creator, bounty_id]` |
+| Escrow | `["escrow", bounty]` |
+| Submission | `["submission", bounty, submission_id]` |
+
+### Safety invariants (enforced on-chain)
+
+- Only the **creator** can approve, cancel or refund.
+- A completed bounty **cannot be paid twice**, and cannot be refunded.
+- The contributor **cannot** withdraw from escrow directly — only an approval releases it.
+- The reward **cannot be changed** after funding.
+- Refund requires the **deadline to have passed** with no approved winner.
+
+COOK is Cookie Chain's native token (9 decimals), so the escrow holds native lamports — no backend
+wallet ever custodies funds. See [`program/README.md`](program/README.md) for build/test/deploy.
+
 ## Tech stack
 
 - **Cookie Chain** (SVM), native token **COOK** (9 decimals) · **Nightly** wallet
@@ -130,8 +163,14 @@ an IDL, copy `program/target/idl/cookie_bounties.json` over `src/lib/program/idl
 ### 2) The app (Vercel)
 
 Push to GitHub, import the repo in Vercel, and set the env vars above in **Project → Settings →
-Environment Variables** (set `NEXT_PUBLIC_APP_URL` to your Vercel domain). `vercel.json` schedules
-the indexer reconcile via **Vercel Cron** (`/api/indexer/sync`); set `CRON_SECRET` to lock it down.
+Environment Variables** (set `NEXT_PUBLIC_APP_URL` to your Vercel domain).
+
+**Keeping the board fresh when idle (free — no Vercel Pro):** the app already reconciles after every
+action and every 20s while someone's on the page. To also update while idle, a **GitHub Actions**
+workflow ([`.github/workflows/reconcile.yml`](.github/workflows/reconcile.yml)) pings
+`/api/indexer/sync` on a schedule — Vercel Hobby only allows daily crons, so this sidesteps that.
+Add two repo secrets (**Settings → Secrets and variables → Actions**): `APP_URL` (your deployed URL)
+and `CRON_SECRET` (matching the app env). Trigger it manually anytime from the **Actions** tab.
 
 ## Layout
 

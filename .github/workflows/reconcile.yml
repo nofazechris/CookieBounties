@@ -1,0 +1,23 @@
+name: Reconcile indexer
+
+# Free alternative to Vercel Cron (Hobby plans only allow daily crons). This pings the deployed
+# app's reconcile endpoint on a schedule so the board/activity stay fresh even when nobody's on the
+# page. Set two repo secrets: APP_URL (your deployed base URL) and CRON_SECRET (matching the app's).
+on:
+  schedule:
+    - cron: "*/10 * * * *" # every ~10 min (GitHub may delay under load)
+  workflow_dispatch: {} # lets you run it manually from the Actions tab
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger reconcile
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$APP_URL" ]; then echo "APP_URL secret not set — skipping."; exit 0; fi
+          curl -fsS -X GET "$APP_URL/api/indexer/sync" \
+            -H "Authorization: Bearer ${CRON_SECRET}" \
+            -w "\nHTTP %{http_code}\n"
